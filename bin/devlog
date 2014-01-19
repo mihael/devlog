@@ -1,0 +1,41 @@
+#!/usr/bin/env ruby
+require 'benchmark'
+require File.expand_path(File.join(File.dirname(__FILE__), %w[.. lib devlog.rb]))
+USAGE= <<-EOF
+  #{Devlog.display_version}
+
+  This software is intended to parse and present information within devlog.markdown development logs.
+
+  #{'Use it as You'.green} #{'dodo'.pur}.
+
+  Usage:
+
+    #{'devlog'.red} /path/to/devlog.markdown
+
+EOF
+#arguments
+$:.unshift File.join(File.dirname(__FILE__))
+@in_file = ARGV[0]
+def print_usage
+  puts USAGE
+  exit
+end
+def dodo
+  if @in_file
+    include Devlog
+    time = Benchmark.realtime do 
+      t = parse_devlog(@in_file)
+      puts "\nSession::Times:\n"
+      puts("\nCodingSession::Time = %.1f [h]" % t.coding_session_time)
+      puts("\nComSession::Time    = %.1f [h]" % t.com_session_time)
+      puts("\nCharge::Time        = #{(t.coding_session_time + t.com_session_time).round} [h]")
+      puts("\nUnpayed::Time       = #{(t.coding_session_time + t.com_session_time + t.payed_time).round} [h]\n\n")
+    end
+    puts "\nRealtime used : #{time}sec"
+  end
+end
+if ARGV.size > 0
+  dodo
+else
+  print_usage
+end
