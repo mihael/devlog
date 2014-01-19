@@ -26,6 +26,7 @@ Gem::Specification.new do |s|
     "Rakefile",
     "VERSION",
     "bin/devlog",
+    "devlog.gemspec",
     "devlog.markdown",
     "lib/devlog.rb",
     "test/devlog_test.rb",
