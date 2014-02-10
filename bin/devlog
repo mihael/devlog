@@ -24,12 +24,28 @@ def dodo
   if @in_file
     include Devlog
     time = Benchmark.realtime do 
-      t = parse_devlog(@in_file)
-      puts "\nSession::Times:\n"
+      t = parse_devlog_now(@in_file)
+      puts "\nSession::Time:      = #{t.session_time} [h]\n"
       puts("\nCodingSession::Time = %.1f [h]" % t.coding_session_time)
       puts("\nComSession::Time    = %.1f [h]" % t.com_session_time)
-      puts("\nCharge::Time        = #{(t.coding_session_time + t.com_session_time).round} [h]")
-      puts("\nUnpayed::Time       = #{(t.coding_session_time + t.com_session_time + t.payed_time).round} [h]\n\n")
+      puts("\nCharge::Time        = #{t.charge_time} [h]")
+      puts("\nUnpayed::Time       = #{t.unpayed_time} [h]\n")
+      puts("\n")
+      puts("Num of Sessions     = #{t.devlog_sessions.size}\n")
+      puts("Hours per Day       = #{t.per_day} [h]\n")
+      puts("Hours per Week      = #{t.per_week} [h]\n")
+      puts("Hours per Month     = #{t.per_month} [h]\n")
+      puts("Hours last 7 days   = #{t.hours_for_last(7)} [h]\n")
+      puts("Hours last 14 days   = #{t.hours_for_last(14)} [h]\n")
+      puts("Hours last 28 days   = #{t.hours_for_last(28)} [h]\n")
+      puts("\n")
+      puts("Devlog Time         = #{t.devlog_days * 24} [hours]\n")
+      puts("Devlog Days         = #{t.devlog_days}  [days]\n")
+      puts("Devlog Weeks        = #{t.devlog_weeks}  [weeks]\n")
+      puts("Devlog Months       = #{t.devlog_months}  [months]\n")
+      puts("\n")
+      puts("Longest Session     = #{t.longest_session.session_time.round(2)} [hours]\n")
+      puts("Shortest Session     = #{t.shortest_session.session_time.round(2)} [hours]\n")
     end
     puts "\nRealtime used : #{time}sec"
   end

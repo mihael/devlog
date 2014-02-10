@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>$1 ComSession::BEGIN</string>
+	<key>name</key>
+	<string>combegin</string>
+	<key>tabTrigger</key>
+	<string>combegin</string>
+	<key>uuid</key>
+	<string>551F1E72-FF3B-417B-9D85-F3E7DF7FE8E2</string>
+</dict>
+</plist>

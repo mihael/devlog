@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>content</key>
+	<string>$1 SelfSession::END</string>
+	<key>name</key>
+	<string>selfend</string>
+	<key>tabTrigger</key>
+	<string>selfend</string>
+	<key>uuid</key>
+	<string>931EE4CC-247D-40F3-B64A-284B19F3D15C</string>
+</dict>
+</plist>
