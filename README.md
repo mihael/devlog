@@ -22,7 +22,10 @@ these must be entered at the start of the line.
 devlog DSL
 ==========
 
+
+#DD.MM.YYYY HH:MM:SS CodingSession::END
+
+devlog text...
+
 #DD.MM.YYYY HH:MM:SS CodingSession::BEGIN
 
-syntax
-======
