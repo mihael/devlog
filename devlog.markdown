@@ -108,7 +108,7 @@ of communication hours to this devlog, so that tests can be written...
 
 and start a new session higher up, after ii take some breaths...
 
-as text gets written down, at the end of the session ii scroll to the top again and insert the ending command like: #02.02.2014 17:05:50 CodingSession::END
+as text gets written down, at the end of the session ii scroll to the top again and insert the ending command.
 
 #02.02.2014 13:53:37 CodingSession::BEGIN
 
