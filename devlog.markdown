@@ -1,9 +1,22 @@
+#15.08.2014 19:14:21 CodingSession::END
+
+adding some nice stuff... can now see negative and zero sessions, which are basically error entries with zero or negative time.
+
+line numbers are recorded, and printed next to the zero and negative sessions...
+
+running 'devlog' in a folder where there is a devlog.markdown file present, it will attempt to parse and present info...
+
+improved the output...
+
+0.0.3 it is
+
+#15.08.2014 16:35:49 CodingSession::BEGIN
+
 #03.02.2014 21:02:30 CodingSession::END
 
 added some tests, and some new calculations, the devlog binary prints out better stats... 0.0.1 it is.
 
 #03.02.2014 09:37:36 CodingSession::BEGIN
-
 
 #02.02.2014 17:06:00 CodingSession::END
 

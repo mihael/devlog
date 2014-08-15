@@ -14,7 +14,7 @@ module Devlog
   # :stopdoc:
   LIBPATH = ::File.expand_path(::File.dirname(__FILE__)) + ::File::SEPARATOR
   PATH = ::File.dirname(LIBPATH) + ::File::SEPARATOR
-  VERSION = File.open(File.join(File.dirname(__FILE__), %w[.. VERSION]), 'r') 
+  VERSION = File.open(File.join(File.dirname(__FILE__), %w[.. VERSION]), 'r').read
   # :startdoc:
   # Returns the version string for the library.
   #
@@ -48,13 +48,12 @@ module Devlog
     Dir.glob(search_me).sort.each {|rb| require rb}
   end
   def self.display_version
-    "\n#{'Devlog'.green} v#{Devlog.version}\n\n"
+    "\n#{'Devlog'.green} v#{Devlog.version}\n"
   end
   # Write siple console log
   def self.log(txt)
     puts "#{txt}"
   end
-
   
   def parse_datetime(line)
     parts = line[1..-1].split
@@ -63,28 +62,40 @@ module Devlog
 
   def parse_devlog_now(devlog=nil)
     t = Parsing.new
+    t.devlog_file = devlog
+
     return t unless devlog
+    return t unless File.exist?(devlog)
 
     timeEnd = nil
     timeBegin = nil
+    timeEnd_line_number = nil
+    timeBegin_line_number = nil
     in_session = false
     temp_zezzion = nil
 
+    line_number = 0
     File.open(devlog, "r").each do |line|
+      line_number+=1 
+      
       if line =~ /-NOCHARGE/
         in_session = false #do not count nocharge sessions, this is a secret feature
       elsif line =~ /\A#/ && line =~ /CodingSession::END/
         in_session = true
         timeEnd = parse_datetime(line)
+        timeEnd_line_number = line_number
         
         #zezzion
         temp_zezzion = Zezzion.new
         temp_zezzion.zzend = timeEnd
+        temp_zezzion.zzend_line_number = timeEnd_line_number
 
       elsif line =~ /\A#/ && line =~ /CodingSession::BEGIN/
         if in_session
           in_session = false
           timeBegin = parse_datetime(line)
+          timeBegin_line_number = line_number
+
           #cs_time += (timeEnd - timeBegin).to_f * 24 #hours *60 #minutes *60 #seconds
           delta = (timeEnd - timeBegin).to_f * 24 #hours *60 #minutes *60 #seconds
           t.coding_session_time += delta
@@ -92,6 +103,7 @@ module Devlog
           #zezzion
           temp_zezzion.coding_session_time += delta
           temp_zezzion.zzbegin = timeBegin
+          temp_zezzion.zzbegin_line_number = timeBegin_line_number
           t.add_zezzion temp_zezzion
           temp_zezzion = nil
 
@@ -99,22 +111,26 @@ module Devlog
       elsif line =~ /\A#/ && line =~ /ComSession::END/
         in_session = true
         timeEnd = parse_datetime(line)
+        timeEnd_line_number = line_number
 
         #zezzion
         temp_zezzion = Zezzion.new(Zezzion::COM)
         temp_zezzion.zzend = timeEnd
-
+        temp_zezzion.zzend_line_number = timeEnd_line_number
 
       elsif line =~ /\A#/ && line =~ /ComSession::BEGIN/
         if in_session
           in_session = false
           timeBegin = parse_datetime(line)
+          timeBegin_line_number = line_number
+
           delta = (timeEnd - timeBegin).to_f * 24
           t.com_session_time += delta
 
           #zezzion
           temp_zezzion.coding_session_time += delta
           temp_zezzion.zzbegin = timeBegin
+          temp_zezzion.zzbegin_line_number = timeBegin_line_number
           t.add_zezzion temp_zezzion
           temp_zezzion = nil
 
@@ -200,10 +216,10 @@ module Devlog
   end
 
   class Parsing
-    #this is the total time, but each sessino has these same params
+    #this is the total time, but each session has these same params
     attr_accessor :coding_session_time, :com_session_time, :payed_time #backward compatible object with Tajm, from devlog 0.0.0
 
-    attr_accessor :zezzions
+    attr_accessor :zezzions, :devlog_file
 
     def initialize(viewing_time_current_date=DateTime.now)
       @viewing_time_current_date = viewing_time_current_date
@@ -213,13 +229,15 @@ module Devlog
       @coding_session_time = 0.0
       @com_session_time = 0.0
       @payed_time = 0.0
+
+      @devlog_file = ""
      end
 
     def add_zezzion(zezzion)
       @zezzions << zezzion
     end
 
-    #gloabl devlog start, first entry
+    #global devlog start, first entry
     def devlog_begin
       @zezzions.last.zzbegin
     end
@@ -291,14 +309,80 @@ module Devlog
       @zezzions.min_by(&:session_time)
     end
 
+    def negative_sessions
+      @zezzions.select{|zezzion| zezzion.session_time<0}
+    end
+
+    def zero_sessions
+      @zezzions.select{|zezzion| zezzion.session_time==0.0}
+    end
+
+    def zero_sessions_to_s
+      sessions_to_s(zero_sessions)
+    end
+
+    def negative_sessions_to_s
+      sessions_to_s(negative_sessions)
+    end
+
+    def last_session
+      @zezzions.first #devlog_begin
+    end
+
+    def first_session
+      @zezzions.last #devlog_end
+    end
+
     #return all sessions
     def devlog_sessions
       @zezzions
     end
 
+    def validation_string
+      vs = ""
+      vs << (@zezzions.any? ? '' : "No sessions recorded, add some first...\n".red)
+      vs << (File.exist?(self.devlog_file) ? '' : "No such file #{self.devlog_file}...\n".red)
+    end
 
+    def to_info_string
+      s = ""
+      s <<  "\nSession::Time:      = #{self.session_time} [h]\n"
+      s << ("\nCodingSession::Time = %.1f [h]" % self.coding_session_time)
+      s << ("\nComSession::Time    = %.1f [h]" % self.com_session_time)
+      s << ("\nCharge::Time        = #{self.charge_time} [h]")
+      s << ("\nUnpayed::Time       = #{self.unpayed_time.to_s.green} [h]\n")
+      s << ("\n")
+      s << ("Num of Sessions     = #{self.devlog_sessions.size}\n")
+      s << ("Hours per Day       = #{self.per_day} [h]\n")
+      s << ("Hours per Week      = #{self.per_week} [h]\n")
+      s << ("Hours per Month     = #{self.per_month} [h]\n")
+      s << ("Hours last 7 days   = #{self.hours_for_last(7)} [h]\n")
+      s << ("Hours last 14 days  = #{self.hours_for_last(14)} [h]\n")
+      s << ("Hours last 28 days  = #{self.hours_for_last(28)} [h]\n")
+      s << ("\n")
+      s << ("Devlog Time         = #{self.devlog_days * 24} [hours]\n")
+      s << ("Devlog Days         = #{self.devlog_days}  [days]\n")
+      s << ("Devlog Weeks        = #{self.devlog_weeks}  [weeks]\n")
+      s << ("Devlog Months       = #{self.devlog_months}  [months]\n")
+      if self.negative_sessions.any?
+        s << ("\n")
+        s << ("#{'Negative Sessions'.red}   = #{self.negative_sessions_to_s}\n")
+      end
+      if self.zero_sessions.any?
+        s << ("\n")
+        s << ("#{'Zero Sessions'.blue}       = #{self.zero_sessions_to_s}\n")
+      end
+      s << ("\n")
+      s << ("Longest Session     = #{self.longest_session.session_time.round(2)} [hours]\n")
+      s << ("Shortest Session    = #{self.shortest_session.session_time.round(2)} [hours]\n")
+      s << ("Last Session        = #{self.devlog_end.ago_in_words}, duration: #{self.last_session.session_time.round(2)} [hours]")
+    end
 
     private 
+      def sessions_to_s(sessions)
+        "\n" + sessions.collect{|session| "                      " + session.to_s}.join("\n")
+      end
+
       #count :weeks=>1, or :days=>1, or :years=>1
       def count_time(options)
         num = 0
@@ -314,10 +398,11 @@ module Devlog
 
 
   class Zezzion
-    COM = 1
-    COD = 0
+    COM = 1 #communication session
+    COD = 0 #coding session
     attr_accessor :zzbegin, :zzend, :zzbegin_title, :zzend_title, :zztype
     attr_accessor :coding_session_time, :com_session_time, :payed_time
+    attr_accessor :zzend_line_number, :zzbegin_line_number
 
     def initialize(zztype=COD)
       @zztype = zztype
@@ -329,6 +414,8 @@ module Devlog
       @coding_session_time = 0.0
       @com_session_time = 0.0
       @payed_time = 0.0
+      @zzbegin_line_number = 0
+      @zzend_line_number = 0
     end
 
     #in seconds
@@ -354,10 +441,18 @@ module Devlog
       session_time/days
     end
     def per_week
-      
+      #todo
     end
     def per_month
+      #todo
+    end
 
+    def type
+      zztype == 0 ? "CodingSession" : "ComSession"
+    end
+
+    def to_s
+      "#{type}, begin on line #{@zzbegin_line_number} at #{@zzbegin}, ends on line #{@zzend_line_number} at #{@zzend}, #{session_time.round(2)}[hour]"
     end
   end
 
@@ -371,5 +466,37 @@ module Devlog
     end
 
   end
-  
+
+end
+
+module DateTimeAgoInWords
+  def ago_in_words
+    return 'a very very long time ago' if self.year < 1800
+    secs = Time.now - self
+    return 'just now' if secs > -1 && secs < 1
+    return '' if secs <= -1
+    pair = ago_in_words_pair(secs)
+    ary = ago_in_words_singularize(pair)
+    ary.size == 0 ? '' : ary.join(' and ') << ' ago'
+  end
+  private
+  def ago_in_words_pair(secs)
+    [[60, :seconds], [60, :minutes], [24, :hours], [100_000, :days]].map{ |count, name|
+      if secs > 0
+        secs, n = secs.divmod(count)
+        "#{n.to_i} #{name}"
+      end
+    }.compact.reverse[0..1]
+  end
+  def ago_in_words_singularize(pair)
+    if pair.size == 1
+      pair.map! {|part| part[0, 2].to_i == 1 ? part.chomp('s') : part }
+    else
+      pair.map! {|part| part[0, 2].to_i == 1 ? part.chomp('s') : part[0, 2].to_i == 0 ? nil : part }
+    end
+    pair.compact
+  end
+end
+class DateTime
+  include DateTimeAgoInWords
 end

@@ -123,4 +123,21 @@ class DevlogTest < Test::Unit::TestCase
 		load_devlog_stat
 		assert(@tajm_stat.devlog_sessions.size==8, "should be 8, but is #{@tajm_stat.devlog_sessions.size}")
 	end
+
+	def test_negative_sessions
+		load_devlog_negative
+		assert(@tajm_negative.devlog_sessions.size==5, "should be 5, but is #{@tajm_negative.devlog_sessions.size}")
+		shortest_session_time_rounded = @tajm_negative.shortest_session.session_time.round(2)
+		assert(shortest_session_time_rounded==-2, "should be -2.0, but is #{shortest_session_time_rounded}")
+		assert(@tajm_negative.negative_sessions.size==2, "should be 2, but is #{@tajm_negative.negative_sessions.size}")
+	end
+
+	def test_zero_sessions
+		load_devlog_negative
+		assert(@tajm_negative.devlog_sessions.size==5, "should be 5, but is #{@tajm_negative.devlog_sessions.size}")
+		zero_session_time_rounded = @tajm_negative.zero_sessions.first.session_time.round(2)
+		assert(zero_session_time_rounded==0.0, "should be 0.0, but is #{zero_session_time_rounded}")
+		assert(@tajm_negative.zero_sessions.size==1, "should be 1, but is #{@tajm_negative.zero_sessions.size}")
+	end
+
 end

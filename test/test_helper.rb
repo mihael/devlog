@@ -40,3 +40,7 @@ end
 def load_devlog_single
 	@tajm_single = parse_devlog_now(File.join(File.dirname(__FILE__), '..', 'test_single_devlog.markdown'))
 end
+
+def load_devlog_negative
+	@tajm_negative = parse_devlog_now(File.join(File.dirname(__FILE__), '..', 'test_negative_devlog.markdown'))
+end

@@ -2,15 +2,18 @@
 require 'benchmark'
 require File.expand_path(File.join(File.dirname(__FILE__), %w[.. lib devlog.rb]))
 USAGE= <<-EOF
-  #{Devlog.display_version}
+#{Devlog.display_version}
+This software is intended to parse and present information within devlog.markdown development logs.
 
-  This software is intended to parse and present information within devlog.markdown development logs.
+#{'Use it as You'.green} #{'dodo'.pur}.
 
-  #{'Use it as You'.green} #{'dodo'.pur}.
+Using with a file:
 
-  Usage:
+  #{'devlog'.red} /path/to/devlog.markdown
 
-    #{'devlog'.red} /path/to/devlog.markdown
+or just in a folder with a 'devlog.markdown' file:
+
+  #{'devlog'.green} 
 
 EOF
 #arguments
@@ -18,40 +21,35 @@ $:.unshift File.join(File.dirname(__FILE__))
 @in_file = ARGV[0]
 def print_usage
   puts USAGE
-  exit
 end
 def dodo
-  if @in_file
-    include Devlog
-    time = Benchmark.realtime do 
+  include Devlog
+  time = Benchmark.realtime do 
+    if @in_file
+      puts "Parsing #{@in_file}...".red
       t = parse_devlog_now(@in_file)
-      puts "\nSession::Time:      = #{t.session_time} [h]\n"
-      puts("\nCodingSession::Time = %.1f [h]" % t.coding_session_time)
-      puts("\nComSession::Time    = %.1f [h]" % t.com_session_time)
-      puts("\nCharge::Time        = #{t.charge_time} [h]")
-      puts("\nUnpayed::Time       = #{t.unpayed_time} [h]\n")
-      puts("\n")
-      puts("Num of Sessions     = #{t.devlog_sessions.size}\n")
-      puts("Hours per Day       = #{t.per_day} [h]\n")
-      puts("Hours per Week      = #{t.per_week} [h]\n")
-      puts("Hours per Month     = #{t.per_month} [h]\n")
-      puts("Hours last 7 days   = #{t.hours_for_last(7)} [h]\n")
-      puts("Hours last 14 days   = #{t.hours_for_last(14)} [h]\n")
-      puts("Hours last 28 days   = #{t.hours_for_last(28)} [h]\n")
-      puts("\n")
-      puts("Devlog Time         = #{t.devlog_days * 24} [hours]\n")
-      puts("Devlog Days         = #{t.devlog_days}  [days]\n")
-      puts("Devlog Weeks        = #{t.devlog_weeks}  [weeks]\n")
-      puts("Devlog Months       = #{t.devlog_months}  [months]\n")
-      puts("\n")
-      puts("Longest Session     = #{t.longest_session.session_time.round(2)} [hours]\n")
-      puts("Shortest Session     = #{t.shortest_session.session_time.round(2)} [hours]\n")
+      puts t.validation_string
+      puts t.to_info_string
+    else
+      puts "Parsing devlog.markdown in current folder...".green
+      t = parse_devlog_now("devlog.markdown") #try default file
+      puts t.validation_string
+      puts t.to_info_string
     end
-    puts "\nRealtime used : #{time}sec"
+ end
+ puts "\nRealtime used : #{time}sec\n\n"
+end
+
+begin
+
+  if ARGV.size > 0
+    dodo
+  else
+      dodo
   end
+
+rescue
+    print_usage
 end
-if ARGV.size > 0
-  dodo
-else
-  print_usage
-end
+
+#exit
