@@ -18,6 +18,10 @@ sessions are separated with beginning and end "devlog DSL" entries,
 
 these must be entered at the start of the line.
 
+how to write?
+=============
+
+like a book, top down, but always start a new session on top of the file, so that Your customer sees the latest entry there.
 
 devlog DSL
 ==========
