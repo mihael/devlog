@@ -44,13 +44,17 @@ to run in current folder (default), expecting file `devlog.markdown` to be prese
 
 `devlog`
 
-run in current folder and spawn coding session:
+run in current folder and start coding session:
 
-`devlog begin`
+`devlog b`
 
-run in current folder and finish coding session:
+run in current folder and stop coding session:
 
-`devlog end`
+`devlog e`
+
+run in current folder and check session status:
+
+`devlog s`
 
 run in current folder and commit to git repo (if any):
 
