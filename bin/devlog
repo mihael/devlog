@@ -11,45 +11,68 @@ Using with a file:
 
   #{'devlog'.red} /path/to/devlog.markdown
 
-or just in a folder with a 'devlog.markdown' file:
+or in a folder with a 'devlog.markdown' file in it:
 
   #{'devlog'.green} 
+
+commands for the current folder:
+
+  #{'devlog'.green} b ~ starts coding session
+  #{'devlog'.green} e ~ stops coding session
+  #{'devlog'.green} s ~ status of coding session
+  #{'devlog'.green} save ~ commit & push git repo
+  #{'devlog'.green} commit ~ commit git repo
+  #{'devlog'.green} push ~ push git repo
 
 EOF
 #arguments
 $:.unshift File.join(File.dirname(__FILE__))
-@in_file = ARGV[0]
+@in_file_or_cmd = ARGV[0]
 def print_usage
   puts USAGE
+end
+def parse_now(devlog_file='devlog.markdown', msg='')
+  puts msg
+  t = parse_devlog_now(devlog_file)
+  puts t.validation_string
+  puts t.to_info_string
+  puts is_session_open(devlog_file) ? "\nSession is open...".yellow : "\nNo open session.".green
 end
 def dodo
   include Devlog
   time = Benchmark.realtime do 
-    if @in_file
-      puts "Parsing #{@in_file}...".red
-      t = parse_devlog_now(@in_file)
-      puts t.validation_string
-      puts t.to_info_string
+
+    if @in_file_or_cmd == 'commit'
+      `git commit -am 'devlog';git push`
+    elsif @in_file_or_cmd == 'b'
+      start_coding_session("devlog.markdown")
+    elsif @in_file_or_cmd == 'e'
+      stop_coding_session("devlog.markdown")
+    elsif @in_file_or_cmd == 'commit'
+      puts "Commit git"
+      `git commit -am "devlog"`
+    elsif @in_file_or_cmd == 'push'
+      puts "Push git"
+      `git push`
+    elsif @in_file_or_cmd == 'save'
+      puts "Commit and push git"
+      `git commit -am "devlog" && git push`
+    elsif @in_file_or_cmd == 's'
+      puts is_session_open("devlog.markdown") ? "Session is open..." : "No open session."
+    elsif @in_file_or_cmd =~ /markdown/
+      parse_now(@in_file_or_cmd, "Parsing #{@in_file_or_cmd}...".red)
     else
-      puts "Parsing devlog.markdown in current folder...".green
-      t = parse_devlog_now("devlog.markdown") #try default file
-      puts t.validation_string
-      puts t.to_info_string
+      parse_now('devlog.markdown', "Parsing devlog.markdown in current folder...".green)
     end
+
  end
- puts "\nRealtime used : #{time}sec\n\n"
+ puts "\n\n"
+ #puts "\nRealtime: #{time}sec\n\n"
 end
-
+#devlog run
 begin
-
-  if ARGV.size > 0
-    dodo
-  else
-      dodo
-  end
-
-rescue
+  dodo
+rescue Exception => e
+    puts "\nRuntime exception: #{e.message.to_s.blue}\n"
     print_usage
 end
-
-#exit

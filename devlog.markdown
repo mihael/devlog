@@ -1,3 +1,18 @@
+
+#02.02.2015 17:53:20 CodingSession::END
+
+cleaning up a little... enhancing the devlog executable features...
+
+if You now put Your devlog.markdown under git, You can simply go to Your devlog dir and say: devlog save, and it will commit and push the git repository with default message: "devlog".
+
+getting this: /Users/mihael/.rvm/gems/ruby-2.2.0@devlog/gems/activesupport-3.2.16/lib/active_support/values/time_zone.rb:270: warning: circular argument reference - now ... [which is obviously related to this](https://github.com/rails/rails/issues/18201)
+
+next time ii work on this code want to also get rid of activesupport dependency... for now changed the gem required version in the Gemfile...
+
+releasing the fourth version...
+
+#02.02.2015 11:04:30 CodingSession::BEGIN
+
 #15.08.2014 19:14:21 CodingSession::END
 
 adding some nice stuff... can now see negative and zero sessions, which are basically error entries with zero or negative time.

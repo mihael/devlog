@@ -1,5 +1,7 @@
-require "date"
+#require "time"
+#require "date"
 require "active_support/all"
+
 class String
   def red; colorize(self, "\e[1m\e[31m"); end
   def green; colorize(self, "\e[1m\e[32m"); end
@@ -55,9 +57,11 @@ module Devlog
     puts "#{txt}"
   end
   
+  #parsing datetime
+  DATETIME_FORMAT = "%d.%m.%Y %H:%M:%S"
   def parse_datetime(line)
     parts = line[1..-1].split
-    DateTime.strptime("#{parts[0]} #{parts[1]}","%d.%m.%Y %H:%M:%S")
+    DateTime.strptime("#{parts[0]} #{parts[1]}", DATETIME_FORMAT)
   end
 
   def parse_devlog_now(devlog=nil)
@@ -172,6 +176,7 @@ module Devlog
     t
   end
   
+  #this is just a historic event, not used
   def parse_devlog(devlog=nil)
     t = Tajm.new
     return t unless devlog
@@ -215,6 +220,48 @@ module Devlog
     t
   end
 
+  #workflow methods
+
+  #helper for the time entries
+  def devlog_session_entry(session_type='Coding', begin_end='BEGIN')
+    "\n##{Time.now.strftime(DATETIME_FORMAT)} #{session_type}Session::#{begin_end}\n"
+  end
+
+  #prepend a string to a text file
+  def prepend_string(t="\n", devlog_file='devlog.markdown')
+    system "echo '#{t}' | cat - #{devlog_file} > #{devlog_file}.tmp && mv #{devlog_file}.tmp #{devlog_file}"
+  end
+
+  #insert a new session 
+  def start_coding_session(devlog_file='devlog.markdown')
+    prepend_string(devlog_session_entry('Coding', 'BEGIN'), devlog_file)
+  end
+
+  #close the current session, if any
+  def stop_coding_session(devlog_file='devlog.markdown')
+    prepend_string(devlog_session_entry('Coding', 'END'), devlog_file)
+  end
+
+  #if the first non empty line is not and END entry then session is open (or malformed file)
+  def is_session_open(devlog_file='devlog.markdown')
+    is_open = true
+    File.open(devlog_file, 'r') do |f|
+      loop do
+        break if not line = f.gets #exit on end of file, read line        
+        if (line.strip.size>0) #non empty line
+          if (line =~ /Session::END/)
+            is_open = false 
+            break
+          else
+            break
+          end
+        end
+      end
+    end
+    is_open
+  end
+
+  #the parsing object
   class Parsing
     #this is the total time, but each session has these same params
     attr_accessor :coding_session_time, :com_session_time, :payed_time #backward compatible object with Tajm, from devlog 0.0.0
@@ -360,7 +407,7 @@ module Devlog
       s << ("Hours last 14 days  = #{self.hours_for_last(14)} [h]\n")
       s << ("Hours last 28 days  = #{self.hours_for_last(28)} [h]\n")
       s << ("\n")
-      s << ("Devlog Time         = #{self.devlog_days * 24} [hours]\n")
+      s << ("Devlog Time         = #{self.devlog_days * 24} [h]\n")
       s << ("Devlog Days         = #{self.devlog_days}  [days]\n")
       s << ("Devlog Weeks        = #{self.devlog_weeks}  [weeks]\n")
       s << ("Devlog Months       = #{self.devlog_months}  [months]\n")
@@ -373,9 +420,9 @@ module Devlog
         s << ("#{'Zero Sessions'.blue}       = #{self.zero_sessions_to_s}\n")
       end
       s << ("\n")
-      s << ("Longest Session     = #{self.longest_session.session_time.round(2)} [hours]\n")
-      s << ("Shortest Session    = #{self.shortest_session.session_time.round(2)} [hours]\n")
-      s << ("Last Session        = #{self.devlog_end.ago_in_words}, duration: #{self.last_session.session_time.round(2)} [hours]")
+      s << ("Longest Session     = #{self.longest_session.to_s}\n")
+      s << ("Shortest Session    = #{self.shortest_session.to_s}\n")
+      s << ("Last Session        = #{self.devlog_end.ago_in_words}, duration: #{self.last_session.session_time.round(3)} [h]")
     end
 
     private 
@@ -452,7 +499,7 @@ module Devlog
     end
 
     def to_s
-      "#{type}, begin on line #{@zzbegin_line_number} at #{@zzbegin}, ends on line #{@zzend_line_number} at #{@zzend}, #{session_time.round(2)}[hour]"
+      "#{session_time.round(3)} [h] #{type}, begin on line #{@zzbegin_line_number} at #{@zzbegin}, ends on line #{@zzend_line_number} at #{@zzend}"
     end
   end
 
@@ -473,8 +520,8 @@ module DateTimeAgoInWords
   def ago_in_words
     return 'a very very long time ago' if self.year < 1800
     secs = Time.now - self
-    return 'just now' if secs > -1 && secs < 1
-    return '' if secs <= -1
+    return 'just over' if secs > -1 && secs < 1
+    return 'now' if secs <= -1
     pair = ago_in_words_pair(secs)
     ary = ago_in_words_singularize(pair)
     ary.size == 0 ? '' : ary.join(' and ') << ' ago'

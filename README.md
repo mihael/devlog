@@ -8,11 +8,11 @@ structure
 
 a devlog consists of many coding or communication sessions. 
 
-the current session is always written on the top of the file.
+the current development session is written at the top of the file.
 
 older sessions are towards the end of the file. 
 
-the first session is the most down, scroll down at the end of the file.
+the first session is the one at the bottom, scroll down at the end of the file.
 
 sessions are separated with beginning and end "devlog DSL" entries, 
 
@@ -32,4 +32,35 @@ devlog DSL
 devlog text...
 
 #DD.MM.YYYY HH:MM:SS CodingSession::BEGIN
+
+using the devlog binary
+===================
+
+to parse a devlog file explicitly:
+
+`devlog /path/devlog_file.markdown`
+
+to run in current folder (default), expecting file `devlog.markdown` to be present in it:
+
+`devlog`
+
+run in current folder and spawn coding session:
+
+`devlog begin`
+
+run in current folder and finish coding session:
+
+`devlog end`
+
+run in current folder and commit to git repo (if any):
+
+`devlog commit`
+
+run in current folder and push to git repo (if any):
+
+`devlog push`
+
+run in current folder and commit&push git repo (if any):
+
+`devlog save`
 
