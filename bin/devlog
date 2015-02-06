@@ -45,8 +45,10 @@ def dodo
     if @in_file_or_cmd == 'commit'
       `git commit -am 'devlog';git push`
     elsif @in_file_or_cmd == 'b'
+      puts "CodingSession::BEGIN"
       start_coding_session("devlog.markdown")
     elsif @in_file_or_cmd == 'e'
+      puts "CodingSession::END"
       stop_coding_session("devlog.markdown")
     elsif @in_file_or_cmd == 'commit'
       puts "Commit git"
