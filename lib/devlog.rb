@@ -240,6 +240,17 @@ module Devlog
   #close the current session, if any
   def stop_coding_session(devlog_file='devlog.markdown')
     prepend_string(devlog_session_entry('Coding', 'END'), devlog_file)
+    save_info(devlog_file)
+  end
+
+  def save_info(devlog_file='devlog.markdown', info_file='info.markdown')
+    info = parse_devlog_now(devlog_file)
+    if info.has_info?
+      File.open(File.join(File.dirname(devlog_file), info_file), 'w') {|f| f.write(info.to_info_string(short=true)) }
+      `cp #{devlog_file} #{File.join(File.dirname(devlog_file), 'README.markdown')}`
+    else
+      puts "No info present.".red
+    end
   end
 
   #if the first non empty line is not and END entry then session is open (or malformed file)
@@ -278,7 +289,11 @@ module Devlog
       @payed_time = 0.0
 
       @devlog_file = ""
-     end
+    end
+
+    def has_info?
+      @zezzions.any?
+    end
 
     def add_zezzion(zezzion)
       @zezzions << zezzion
@@ -391,38 +406,41 @@ module Devlog
       vs << (File.exist?(self.devlog_file) ? '' : "No such file #{self.devlog_file}...\n".red)
     end
 
-    def to_info_string
+    def to_info_string(short=false)
       s = ""
       s <<  "\nSession::Time:      = #{self.session_time} [h]\n"
-      s << ("\nCodingSession::Time = %.1f [h]" % self.coding_session_time)
-      s << ("\nComSession::Time    = %.1f [h]" % self.com_session_time)
-      s << ("\nCharge::Time        = #{self.charge_time} [h]")
-      s << ("\nUnpayed::Time       = #{self.unpayed_time.to_s.green} [h]\n")
+      s << ("\nCodingSession::Time = %.1f [h]\n" % self.coding_session_time)
+      s << ("\nComSession::Time    = %.1f [h]\n" % self.com_session_time)
+      s << ("\nCharge::Time        = #{self.charge_time} [h]\n")
+      s << ("\nUnpayed::Time       = #{self.unpayed_time.to_s} [h]\n")
       s << ("\n")
-      s << ("Num of Sessions     = #{self.devlog_sessions.size}\n")
-      s << ("Hours per Day       = #{self.per_day} [h]\n")
-      s << ("Hours per Week      = #{self.per_week} [h]\n")
-      s << ("Hours per Month     = #{self.per_month} [h]\n")
-      s << ("Hours last 7 days   = #{self.hours_for_last(7)} [h]\n")
-      s << ("Hours last 14 days  = #{self.hours_for_last(14)} [h]\n")
-      s << ("Hours last 28 days  = #{self.hours_for_last(28)} [h]\n")
-      s << ("\n")
-      s << ("Devlog Time         = #{self.devlog_days * 24} [h]\n")
-      s << ("Devlog Days         = #{self.devlog_days}  [days]\n")
-      s << ("Devlog Weeks        = #{self.devlog_weeks}  [weeks]\n")
-      s << ("Devlog Months       = #{self.devlog_months}  [months]\n")
-      if self.negative_sessions.any?
+      unless short
+        s << ("Num of Sessions     = #{self.devlog_sessions.size}\n")
+        s << ("Hours per Day       = #{self.per_day} [h]\n")
+        s << ("Hours per Week      = #{self.per_week} [h]\n")
+        s << ("Hours per Month     = #{self.per_month} [h]\n")
+        s << ("Hours last 7 days   = #{self.hours_for_last(7)} [h]\n")
+        s << ("Hours last 14 days  = #{self.hours_for_last(14)} [h]\n")
+        s << ("Hours last 28 days  = #{self.hours_for_last(28)} [h]\n")
         s << ("\n")
-        s << ("#{'Negative Sessions'.red}   = #{self.negative_sessions_to_s}\n")
-      end
-      if self.zero_sessions.any?
+        s << ("Devlog Time         = #{self.devlog_days * 24} [h]\n")
+        s << ("Devlog Days         = #{self.devlog_days}  [days]\n")
+        s << ("Devlog Weeks        = #{self.devlog_weeks}  [weeks]\n")
+        s << ("Devlog Months       = #{self.devlog_months}  [months]\n")
+        if self.negative_sessions.any?
+          s << ("\n")
+          s << ("#{'Negative Sessions'.red}   = #{self.negative_sessions_to_s}\n")
+        end
+        if self.zero_sessions.any?
+          s << ("\n")
+          s << ("#{'Zero Sessions'.blue}       = #{self.zero_sessions_to_s}\n")
+        end
         s << ("\n")
-        s << ("#{'Zero Sessions'.blue}       = #{self.zero_sessions_to_s}\n")
+        s << ("Longest Session     = #{self.longest_session.to_s}\n")
+        s << ("Shortest Session    = #{self.shortest_session.to_s}\n")
+        s << ("Last Session        = #{self.devlog_end.ago_in_words}, duration: #{self.last_session.session_time.round(3)} [h]")
       end
-      s << ("\n")
-      s << ("Longest Session     = #{self.longest_session.to_s}\n")
-      s << ("Shortest Session    = #{self.shortest_session.to_s}\n")
-      s << ("Last Session        = #{self.devlog_end.ago_in_words}, duration: #{self.last_session.session_time.round(3)} [h]")
+      s
     end
 
     private 

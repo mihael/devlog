@@ -136,8 +136,8 @@ class DevlogTest < Test::Unit::TestCase
   end
 
   def test_start_coding_session
-    @empty_devlog = File.join(File.dirname(__FILE__), '..', 'tmp_devlog.markdown')
-    File.new(@empty_devlog, 'w').puts('empty')
+    @empty_devlog = File.join(File.dirname(__FILE__), '..', 'tmp1_devlog.markdown')
+    File.open(@empty_devlog, 'w') {|f| f.puts('empty')}
     start_coding_session(@empty_devlog)
     assert(File.readlines(@empty_devlog).grep(/CodingSession::BEGIN/).size>0, "should insert CodingSession::BEGIN at top of file")
     assert(is_session_open(@empty_devlog)==true, "should be true, session should be open after starting")
@@ -145,12 +145,35 @@ class DevlogTest < Test::Unit::TestCase
   end 
 
   def test_stop_coding_session
-    @empty_devlog = File.join(File.dirname(__FILE__), '..', 'tmp_devlog.markdown')
-    File.new(@empty_devlog, 'w').puts('empty')
+    @empty_devlog = File.join(File.dirname(__FILE__), '..', 'tmp2_devlog.markdown')
+    File.delete(@empty_devlog) if File.exist?(@empty_devlog)
+    File.open(@empty_devlog, 'w') {|f| f.puts('empty')}
     stop_coding_session(@empty_devlog)
     assert(File.readlines(@empty_devlog).grep(/CodingSession::END/).size>0, "should insert CodingSession::END at top of file")
     assert(is_session_open(@empty_devlog)==false, "should be false, session should be closed after stopping")
-    File.delete(@empty_devlog)
+    File.delete(@empty_devlog) if File.exist?(@empty_devlog)
+  end 
+
+  def test_save_info_after_stop_coding_session
+    @devlog_info  = File.join(File.dirname(__FILE__), '..', 'info.markdown')
+    @empty_devlog = File.join(File.dirname(__FILE__), '..', 'tmp3_devlog.markdown')
+    #File.delete(@empty_devlog) if File.exist?(@empty_devlog)
+    File.new(@empty_devlog, 'w').puts('\n')
+    start_coding_session(@empty_devlog)
+    assert(File.readlines(@empty_devlog).grep(/CodingSession::BEGIN/).size>0, "should insert CodingSession::BEGIN at top of file")
+    assert(is_session_open(@empty_devlog)==true, "should be true, session should be open after starting")
+    prepend_string('+1h', @empty_devlog)
+    sleep(1)
+    stop_coding_session(@empty_devlog)
+    assert(File.readlines(@empty_devlog).grep(/CodingSession::END/).size>0, "should insert CodingSession::END at top of file")
+    assert(is_session_open(@empty_devlog)==false, "should be false, session should be closed after stopping")
+    assert(File.exists?(@devlog_info)==true, "should exist")
+    hasinfo = parse_devlog_now(@empty_devlog).has_info?
+    assert(hasinfo==true, 'should have info')
+    assert(File.readlines(@devlog_info).grep(/Session::Time/).size>0, "should have info about Session::Time")
+    assert(File.readlines(@devlog_info).grep(/Unpayed::Time/).size>0, "should have info about Session::Time")
+    assert(File.readlines(@devlog_info).grep(/Num of Sessions/).size==0, "should not include full info")
+    #File.delete(@empty_devlog) if File.exist?(@empty_devlog)
   end 
 
   def test_is_session_open

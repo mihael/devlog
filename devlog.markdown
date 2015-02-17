@@ -1,3 +1,21 @@
+#16.02.2015 23:09:06 CodingSession::END
+
+who's got time...not to sweet dream. still did not get rid of active support... well, let's keep it until, after all, it's active, reactive uppsort... and maybe someday You would dare work without it.
+
+let's see, if ii comment out active_support and run rake test:
+
+23 tests, 53 assertions, 0 failures, 10 errors, 0 pendings, 0 omissions, 0 notifications
+
+just 10 errors, not failures, but what is the difference between the two, 0 is not 1.
+
+#16.02.2015 23:08:38 CodingSession::BEGIN
+
+#09.02.2015 15:41:16 CodingSession::END
+
+aha... no comment haha...
+
+#09.02.2015 15:41:09 CodingSession::BEGIN
+
 
 #02.02.2015 17:53:20 CodingSession::END
 
@@ -100,7 +118,7 @@ obviously the parse_devlog method returns the Tajm object, so that is where the 
 
 ii have the methods implemented at #02.02.2014 15:10:01 and am about to run the test again... the darn thing still fails!  :) and the methods are simply empty now, so let's make the tests pass by returning what, more than zero... ii would need to know exactly the hours and the some testing... so let me do something funky... 
 
-ii adedd parse_devlog_now, which will be developed as the new thing, while parse_devlog will be used as reference, to get the reference time and compare for validity.
+ii added parse_devlog_now, which will be developed as the new thing, (LOL back at this record at #16.02.2015 22:59:10) while parse_devlog will be used as reference, to get the reference time and compare for validity.
 
 also, this morning, ii discovered ii am unable to install gems under ruby 1.8.7 after installing that with rvm on 10.9 OSX, soo ii will add some more code to the binary script, to enable me to push this devlog to a github or any git repo actually and have the summary of the devlog parse inserted before pushing. it just requires some more commands to be implemented and some more parsing... 
 
