@@ -20,6 +20,7 @@ write commands for the current folder, the top three:
   #{'devlog'.green} b ~ starts coding session
   #{'devlog'.green} e ~ stops coding session
   #{'devlog'.green} save ~ save info.markdown, commit & push git repo
+  #{'devlog'.green} saver ~ save info.markdown, copy to README.markdown, commit & push git repo
 
   #{'devlog'.green} i ~ save info.markdown
   #{'devlog'.green} s ~ status of coding session
@@ -64,6 +65,11 @@ def dodo
     elsif @in_file_or_cmd == 'save'
       puts "Save info.markdown and Commit and push git"
       save_info("devlog.markdown")
+      `git commit -am "devlog" && git push`
+    elsif @in_file_or_cmd == 'saver'
+      puts "Save info.markdown, copy devlog to README.markdown and Commit and push git"
+      save_info("devlog.markdown")
+      save_to_readme("devlog.markdown")
       `git commit -am "devlog" && git push`
     elsif @in_file_or_cmd == 's'
       puts is_session_open("devlog.markdown") ? "Session is open..." : "No open session."

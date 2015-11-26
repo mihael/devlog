@@ -247,10 +247,13 @@ module Devlog
     info = parse_devlog_now(devlog_file)
     if info.has_info?
       File.open(File.join(File.dirname(devlog_file), info_file), 'w') {|f| f.write(info.to_info_string(short=true)) }
-      `cp #{devlog_file} #{File.join(File.dirname(devlog_file), 'README.markdown')}`
     else
       puts "No info present.".red
     end
+  end
+
+  def save_to_readme(devlog_file='devlog.markdown')
+    `cp #{devlog_file} #{File.join(File.dirname(devlog_file), 'README.markdown')}`
   end
 
   #if the first non empty line is not and END entry then session is open (or malformed file)

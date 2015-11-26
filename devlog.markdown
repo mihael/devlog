@@ -1,3 +1,12 @@
+#21.02.2015 09:48:04 CodingSession::END
+
+when using the `devlog saver` command, it will also copy the devlog.markdown to `README.markdown`
+this is done so, because github by default renders the README on project front page.
+
+when the devlog file gets extremely large, github will cut it off at the bottom, good that devlog sessions are written at the top of the file, haha.
+
+#21.02.2015 09:26:13 CodingSession::BEGIN
+
 #16.02.2015 23:09:06 CodingSession::END
 
 who's got time...not to sweet dream. still did not get rid of active support... well, let's keep it until, after all, it's active, reactive uppsort... and maybe someday You would dare work without it.
