@@ -27,6 +27,10 @@ write commands for the current folder, the top three:
   #{'devlog'.green} commit ~ commit git repo
   #{'devlog'.green} push ~ push git repo
 
+exporting devlog into a book, which can be read top down, like normal books:
+
+  #{'devlog'.green} x ~ exports into devlog.txt
+
 EOF
 #arguments
 $:.unshift File.join(File.dirname(__FILE__))
@@ -41,11 +45,20 @@ def parse_now(devlog_file='devlog.markdown', msg='')
   puts t.to_info_string
   puts is_session_open(devlog_file) ? "\nSession is open...".yellow : "\nNo open session.".green
 end
+def parse_now(devlog_file='devlog.markdown', msg='')
+  puts msg
+  t = parse_devlog_now(devlog_file)
+  puts t.validation_string
+  puts t.to_info_string
+  puts is_session_open(devlog_file) ? "\nSession is open...".yellow : "\nNo open session.".green
+end
 def dodo
   include Devlog
   time = Benchmark.realtime do 
 
-    if @in_file_or_cmd == 'commit'
+    if @in_file_or_cmd == 'x'
+      export_now('devlog.txt') 
+    elsif @in_file_or_cmd == 'commit'
       `git commit -am 'devlog';git push`
     elsif @in_file_or_cmd == 'b'
       puts "CodingSession::BEGIN"
