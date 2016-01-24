@@ -1,3 +1,9 @@
+#24.01.2016 20:44:45 CodingSession::END
+
+ii can now export the devlog. the top session becomes the bottom one, and a human can read the devlog like a book: top down...
+
+#24.01.2016 19:43:25 CodingSession::BEGIN
+
 #21.02.2015 09:48:04 CodingSession::END
 
 when using the `devlog saver` command, it will also copy the devlog.markdown to `README.markdown`
@@ -63,14 +69,14 @@ added some tests, and some new calculations, the devlog binary prints out better
 #02.02.2014 17:06:00 CodingSession::END
 
 experiencing some bad weather, which took down an optical cable and cut our village off the internet grid...
-which is always a good time to do an open source coding session. 
+which is always a good time to do an open source coding session.
 
 ii added new folder "sublime_text". it will hold everything Sublime Text snippets and commands, which make working with the devlog DSL a breeze. that said, ii feel like a marketeer, haha.
 
 ii added this command "tu.py". which ii use the most, to insert a date time entry into the devlog, like this one #02.02.2014 14:03:35.
 You can attach it to Your favourite key binding, ii usually use "ctrl+alt+t".
 
-to install a command, drop it into 
+to install a command, drop it into
 
 	/Users/You/Library/Application Suport/Sublime Text 3/Packages/User/
 
@@ -85,11 +91,11 @@ ii added a TextMate bundle, which can be installed for Sublime Text as well. it 
 
 and the last one should work in TextMate to insert time:
 
-	tu+Tab: #`date '+%d.%m.%Y %H:%M:%S'` 
+	tu+Tab: #`date '+%d.%m.%Y %H:%M:%S'`
 
 the tmbundle can be dropped in the same folder as the "tu.py" snippet.
 
-just realized, the date format could be something that one would want to configure to its liking... so how would ii code that? 
+just realized, the date format could be something that one would want to configure to its liking... so how would ii code that?
 the snippets would have to be adjusted as well, and the parsing method would have to read some setting from somewhere. which ii dislike very much at this moment, so let me postpone this idea for someone else or some other time...
 
 currently the parser is amazingly simple, written in a very very very short time. and it can stay like that, the devlog only needs to parse its own DSL entries from the devlog file. what ii want to to now is to extend the current code to load each coding session as a separate object, then ii want to see how much time per day, per week... and so on...
@@ -100,7 +106,7 @@ coding... kids building lego rifles, little fast cars and minifigs...
 
 man, ii really have to think hard to not do it old school, to not simply stare at the code and stare and stare, until ii see it and simply write it down. this time, ii have to just ask questions about the functionality, then we will stare. so the first question is, what do ii want to know:
 
-+ how much ii coded per day in hours (this is a sum/n(sum) value) 
++ how much ii coded per day in hours (this is a sum/n(sum) value)
 + how much ii coded per week in hours
 + how much ii coded per month in hours
 
@@ -115,7 +121,7 @@ kids are still playing... haha...
 
 ii added an empty devlog, to test that too... it should not give any results other than Zero...
 
-this works out of the box, 
+this works out of the box,
 
 	4 tests, 15 assertions, 0 failures, 3 errors, 0 skips
 
@@ -125,11 +131,11 @@ ii already know, ii need to keep the whole dataset of datetimes of coding sessio
 
 obviously the parse_devlog method returns the Tajm object, so that is where the methods belong to... for now, ... how long is now? usually not much...
 
-ii have the methods implemented at #02.02.2014 15:10:01 and am about to run the test again... the darn thing still fails!  :) and the methods are simply empty now, so let's make the tests pass by returning what, more than zero... ii would need to know exactly the hours and the some testing... so let me do something funky... 
+ii have the methods implemented at #02.02.2014 15:10:01 and am about to run the test again... the darn thing still fails!  :) and the methods are simply empty now, so let's make the tests pass by returning what, more than zero... ii would need to know exactly the hours and the some testing... so let me do something funky...
 
 ii added parse_devlog_now, which will be developed as the new thing, (LOL back at this record at #16.02.2015 22:59:10) while parse_devlog will be used as reference, to get the reference time and compare for validity.
 
-also, this morning, ii discovered ii am unable to install gems under ruby 1.8.7 after installing that with rvm on 10.9 OSX, soo ii will add some more code to the binary script, to enable me to push this devlog to a github or any git repo actually and have the summary of the devlog parse inserted before pushing. it just requires some more commands to be implemented and some more parsing... 
+also, this morning, ii discovered ii am unable to install gems under ruby 1.8.7 after installing that with rvm on 10.9 OSX, soo ii will add some more code to the binary script, to enable me to push this devlog to a github or any git repo actually and have the summary of the devlog parse inserted before pushing. it just requires some more commands to be implemented and some more parsing...
 
 anyway... ii don't see any other way but to code another class...
 
@@ -143,8 +149,8 @@ each Parsing represents one parsing, and holds an array of sessions read from th
 
 and the kids are playing zombies, while the internets are still hovering somewhere, winter times came late...
 
-let me add 
--9000h 
+let me add
+-9000h
 
 of communication hours to this devlog, so that tests can be written...
 
@@ -158,9 +164,9 @@ as text gets written down, at the end of the session ii scroll to the top again 
 
 adding some simple testing :)
 
-the devlog is always written in real time, 
+the devlog is always written in real time,
 
-it starts and stops the coding session, 
+it starts and stops the coding session,
 
 ii begin coding by entering begin+Tab inside Sublime Text,
 this gives me CodingSession::BEGIN,
@@ -169,7 +175,7 @@ when ii am done with work ii simly enter end+Tab and CodingSessin::END is insert
 
 it is a very simple proces, quick to do, the file is always in the editor, You can use it to record any thing project related,
 
-currently it is up to You to present the devlog to a customer, ii usually use a markdown parser and show the html version of the log, 
+currently it is up to You to present the devlog to a customer, ii usually use a markdown parser and show the html version of the log,
 You can even insert links and have the devlog inside a git repository, pushing it to Your customer or Your website...
 
 there are endless options for devlogs... any project can have a nice devlog... :D
