@@ -33,7 +33,7 @@ class DevlogTest < Test::Unit::TestCase
     assert(@tajm_test.payed_time==-1, "wrong payed time")
     assert(@tajm_test.unpayed_time==4.5, "wrong unpayed wrong")
     assert(@tajm_test.charge_time==5.5, "wrong charge wrong")
-  end 
+  end
 
   def test_p_session_time
     p = Parsing.new
@@ -69,7 +69,7 @@ class DevlogTest < Test::Unit::TestCase
 
   def test_how_much_per_month
     load_devlog_stat
-    assert(@tajm_stat.per_week>0, "the middle month value, not the mean")   
+    assert(@tajm_stat.per_week>0, "the middle month value, not the mean")
   end
 
   def test_devlog_days_0
@@ -111,7 +111,7 @@ class DevlogTest < Test::Unit::TestCase
     load_devlog_stat
     hours = @tajm_stat.hours_for_last(1, parse_datetime("#09.03.2014 11:00:00"))
     assert(hours==1, "should be 1, but is #{hours}")
-    
+
   end
 
   def test_session_count
@@ -142,7 +142,7 @@ class DevlogTest < Test::Unit::TestCase
     assert(File.readlines(@empty_devlog).grep(/CodingSession::BEGIN/).size>0, "should insert CodingSession::BEGIN at top of file")
     assert(is_session_open(@empty_devlog)==true, "should be true, session should be open after starting")
     File.delete(@empty_devlog)
-  end 
+  end
 
   def test_stop_coding_session
     @empty_devlog = File.join(File.dirname(__FILE__), '..', 'tmp2_devlog.markdown')
@@ -152,7 +152,7 @@ class DevlogTest < Test::Unit::TestCase
     assert(File.readlines(@empty_devlog).grep(/CodingSession::END/).size>0, "should insert CodingSession::END at top of file")
     assert(is_session_open(@empty_devlog)==false, "should be false, session should be closed after stopping")
     File.delete(@empty_devlog) if File.exist?(@empty_devlog)
-  end 
+  end
 
   def test_save_info_after_stop_coding_session
     @devlog_info  = File.join(File.dirname(__FILE__), '..', 'info.markdown')
@@ -173,14 +173,31 @@ class DevlogTest < Test::Unit::TestCase
     assert(File.readlines(@devlog_info).grep(/Session::Time/).size>0, "should have info about Session::Time")
     assert(File.readlines(@devlog_info).grep(/Unpayed::Time/).size>0, "should have info about Session::Time")
     assert(File.readlines(@devlog_info).grep(/Num of Sessions/).size==0, "should not include full info")
-    #File.delete(@empty_devlog) if File.exist?(@empty_devlog)
-  end 
+    File.delete(@empty_devlog) if File.exist?(@empty_devlog)
+  end
 
   def test_is_session_open
     @closed_devlog = File.join(File.dirname(__FILE__), '..', 'test_devlog.markdown')
     assert(is_session_open(@closed_devlog)==false, "should be false, session should be closed")
     @open_devlog = File.join(File.dirname(__FILE__), '..', 'test_open_devlog.markdown')
     assert(is_session_open(@open_devlog)==true, "should be true, session should be open")
-  end 
+  end
+
+  def test_devlog_export
+    @exported_devlog = export_devlog_now(File.join(File.dirname(__FILE__), '..', 'test_devlog_export.markdown'))
+    assert(File.exists?(@exported_devlog))
+    assert(File.size(@exported_devlog)>0, "file should not be empty")
+    File.open(@exported_devlog, "r") do |f|
+      first = f.readline
+      assert(first.blank? == false, "first line isn't blank")
+      assert(first =~ /17\.01/, "last line becomes first line in")
+      f.readline #empty line
+      assert(f.readline =~ /Al/, "should keep text as it was, and in proper session")
+      assert(f.readline =~ /Ag/, "should keep text as it was, and in proper session")
+      f.readline #empty line
+      assert(f.readline =~ /17\.01/, "first line becomes last line")
+    end
+    File.delete(@exported_devlog) if File.exist?(@exported_devlog)
+  end
 
 end

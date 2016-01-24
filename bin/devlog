@@ -45,19 +45,19 @@ def parse_now(devlog_file='devlog.markdown', msg='')
   puts t.to_info_string
   puts is_session_open(devlog_file) ? "\nSession is open...".yellow : "\nNo open session.".green
 end
-def parse_now(devlog_file='devlog.markdown', msg='')
+def export_now(devlog_file='devlog.markdown', msg='')
   puts msg
-  t = parse_devlog_now(devlog_file)
-  puts t.validation_string
-  puts t.to_info_string
-  puts is_session_open(devlog_file) ? "\nSession is open...".yellow : "\nNo open session.".green
+  exported_file = export_devlog_now(devlog_file)
+  puts "\nExported to #{exported_file}.".yellow
 end
 def dodo
   include Devlog
-  time = Benchmark.realtime do 
+  time = Benchmark.realtime do
 
-    if @in_file_or_cmd == 'x'
-      export_now('devlog.txt') 
+    if @in_file_or_cmd == 'help'
+      print_usage
+    elsif @in_file_or_cmd == 'x'
+      export_now('devlog.markdown',"Exporting devlog.markdown in current folder...".green)
     elsif @in_file_or_cmd == 'commit'
       `git commit -am 'devlog';git push`
     elsif @in_file_or_cmd == 'b'

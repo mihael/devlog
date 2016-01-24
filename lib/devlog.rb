@@ -56,7 +56,7 @@ module Devlog
   def self.log(txt)
     puts "#{txt}"
   end
-  
+
   #parsing datetime
   DATETIME_FORMAT = "%d.%m.%Y %H:%M:%S"
   def parse_datetime(line)
@@ -80,15 +80,15 @@ module Devlog
 
     line_number = 0
     File.open(devlog, "r").each do |line|
-      line_number+=1 
-      
+      line_number+=1
+
       if line =~ /-NOCHARGE/
         in_session = false #do not count nocharge sessions, this is a secret feature
       elsif line =~ /\A#/ && line =~ /CodingSession::END/
         in_session = true
         timeEnd = parse_datetime(line)
         timeEnd_line_number = line_number
-        
+
         #zezzion
         temp_zezzion = Zezzion.new
         temp_zezzion.zzend = timeEnd
@@ -147,7 +147,7 @@ module Devlog
         if temp_zezzion
           temp_zezzion.com_session_time += delta
         else
-          puts "error adding temp_zezzion com_session_time at line: #{line}"  
+          puts "error adding temp_zezzion com_session_time at line: #{line}"
         end
       elsif line =~ /\A\+[0-9]+[m]/
         delta = (line.to_f / 60)
@@ -157,7 +157,7 @@ module Devlog
         if temp_zezzion
           temp_zezzion.com_session_time += delta
         else
-          puts "error adding temp_zezzion com_session_time at line: #{line}"  
+          puts "error adding temp_zezzion com_session_time at line: #{line}"
         end
       elsif line =~ /\A\-[0-9]+[h]/
         delta = (line.to_f)
@@ -165,17 +165,17 @@ module Devlog
 
         #zezzion
         if temp_zezzion
-          temp_zezzion.payed_time += delta 
+          temp_zezzion.payed_time += delta
         else
           puts "error adding temp_zezzion delta time at line: #{line}"
         end
       end
-        
+
     end
     #return the Parsing object
     t
   end
-  
+
   #this is just a historic event, not used
   def parse_devlog(devlog=nil)
     t = Tajm.new
@@ -184,7 +184,7 @@ module Devlog
     timeEnd = nil
     timeBegin = nil
     in_session = false
-    
+
     File.open(devlog, "r").each do |line|
       if line =~ /-NOCHARGE/
         in_session = false #do not count nocharge sessions
@@ -214,7 +214,7 @@ module Devlog
       elsif line =~ /\A\-[0-9]+[h]/
         t.payed_time += (line.to_f)
       end
-        
+
     end
     #return the Tajm object
     t
@@ -228,11 +228,23 @@ module Devlog
   end
 
   #prepend a string to a text file
-  def prepend_string(t="\n", devlog_file='devlog.markdown')
-    system "echo '#{t}' | cat - #{devlog_file} > #{devlog_file}.tmp && mv #{devlog_file}.tmp #{devlog_file}"
+  #def prepend_string(t="\n", devlog_file='devlog.markdown')
+  #  system "echo '#{t}' | cat - #{devlog_file} > #{devlog_file}.tmp && mv #{devlog_file}.tmp #{devlog_file}"
+  #end
+
+  require 'tempfile'
+  def prepend_string(string="\n", path)
+    Tempfile.open File.basename(path) do |tempfile|
+      tempfile << string
+      File.open(path, 'r+') do |file|
+        tempfile << file.read
+        file.pos = tempfile.pos = 0
+        file << tempfile.read
+      end
+    end
   end
 
-  #insert a new session 
+  #insert a new session
   def start_coding_session(devlog_file='devlog.markdown')
     prepend_string(devlog_session_entry('Coding', 'BEGIN'), devlog_file)
   end
@@ -261,10 +273,10 @@ module Devlog
     is_open = true
     File.open(devlog_file, 'r') do |f|
       loop do
-        break if not line = f.gets #exit on end of file, read line        
+        break if not line = f.gets #exit on end of file, read line
         if (line.strip.size>0) #non empty line
           if (line =~ /Session::END/)
-            is_open = false 
+            is_open = false
             break
           else
             break
@@ -273,6 +285,45 @@ module Devlog
       end
     end
     is_open
+  end
+
+  def export_devlog_now(devlog_file='devlog.markdown')
+    devlog_export_file = File.join(File.dirname(devlog_file), 'devlog_book.markdown')
+    #`sed -n '1!G;h;$p' #{devlog_file} > #{devlog_export_file}` #not what we want! , we want just the sessions upside down, but text intact
+    #so need to parse all sessions and print them out in reverse!
+
+    sessionEnd = ''
+    sessionMidd = ''
+    sessionBegin = ''
+    in_session = false
+
+    #the ends are the begins, the begins are the ends
+
+    File.new(devlog_export_file, 'wb')
+
+    File.open(devlog_file, "r").each do |line|
+      if line =~ /-NOCHARGE/
+        in_session = false #do not export nocharge sessions
+      elsif line =~ /\A#/ && (line =~ /CodingSession::END/ || line =~ /ComSession::END/ )
+        in_session = true
+        sessionEnd = line
+      elsif line =~ /\A#/ && ( line =~ /CodingSession::BEGIN/ || line =~ /ComSession::BEGIN/ )
+        if in_session
+          in_session = false
+          sessionBegin = line
+          s = sessionBegin + sessionMidd + sessionEnd
+          #system "echo '#{s}' | cat - #{devlog_export_file} > #{devlog_export_file}.tmp && mv #{devlog_export_file}.tmp #{devlog_export_file}"
+          prepend_string(s, devlog_export_file)
+          sessionEnd = ''
+          sessionMidd = ''
+          sessionBegin = ''
+        end
+      else
+        sessionMidd << line
+      end
+    end
+
+    devlog_export_file
   end
 
   #the parsing object
@@ -285,7 +336,7 @@ module Devlog
     def initialize(viewing_time_current_date=DateTime.now)
       @viewing_time_current_date = viewing_time_current_date
       @zezzions = []
- 
+
       #backward compatible object with Tajm, from devlog 0.0.0
       @coding_session_time = 0.0
       @com_session_time = 0.0
@@ -338,7 +389,7 @@ module Devlog
     end
 
     #hours per day
-    def per_day      
+    def per_day
       (self.session_time/self.devlog_days).round(2)
     end
     def per_week
@@ -352,7 +403,7 @@ module Devlog
     def charge_time
       (coding_session_time + com_session_time).round(2)
     end
-    
+
     #total charge time in hours, coding plus communication sessions - payed hours
     def unpayed_time
       (coding_session_time + com_session_time + payed_time).round(2)
@@ -446,7 +497,7 @@ module Devlog
       s
     end
 
-    private 
+    private
       def sessions_to_s(sessions)
         "\n" + sessions.collect{|session| "                      " + session.to_s}.join("\n")
       end
@@ -505,7 +556,7 @@ module Devlog
 
     #hours per day
     def per_day
-      #whole time over number of days the parsing covers      
+      #whole time over number of days the parsing covers
       session_time/days
     end
     def per_week
