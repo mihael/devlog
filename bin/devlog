@@ -1,7 +1,7 @@
 #!/usr/bin/env ruby
 require 'benchmark'
 require File.expand_path(File.join(File.dirname(__FILE__), %w[.. lib devlog.rb]))
-USAGE= <<-EOF
+USAGE = <<-EOF
 #{Devlog.display_version}
 This software is intended to parse and present information within devlog.markdown development logs. It also helps You to write the devlog.
 
@@ -13,7 +13,7 @@ Using with a file, for parsing and seeing the information summary:
 
 or in a folder with a 'devlog.markdown' file in it:
 
-  #{'devlog'.green} 
+  #{'devlog'.green}
 
 write commands for the current folder, the top three:
 
@@ -32,32 +32,40 @@ exporting devlog into a book, which can be read top down, like normal books:
   #{'devlog'.green} x ~ exports into devlog.txt
 
 EOF
-#arguments
+
+# arguments
 $:.unshift File.join(File.dirname(__FILE__))
 @in_file_or_cmd = ARGV[0]
+
+def print_backtrace(exception)
+  exception.backtrace.join("\n\t").to_s.blue
+end
+
 def print_usage
   puts USAGE
 end
-def parse_now(devlog_file='devlog.markdown', msg='')
+
+def parse_now(devlog_file = 'devlog.markdown', msg = '')
   puts msg
   t = parse_devlog_now(devlog_file)
   puts t.validation_string
   puts t.to_info_string
   puts is_session_open(devlog_file) ? "\nSession is open...".yellow : "\nNo open session.".green
 end
-def export_now(devlog_file='devlog.markdown', msg='')
+
+def export_now(devlog_file = 'devlog.markdown', msg = '')
   puts msg
   exported_file = export_devlog_now(devlog_file)
   puts "\nExported to #{exported_file}.".yellow
 end
+
 def dodo
   include Devlog
   time = Benchmark.realtime do
-
     if @in_file_or_cmd == 'help'
       print_usage
     elsif @in_file_or_cmd == 'x'
-      export_now('devlog.markdown',"Exporting devlog.markdown in current folder...".green)
+      export_now('devlog.markdown', "Exporting devlog.markdown in current folder...".green)
     elsif @in_file_or_cmd == 'commit'
       `git commit -am 'devlog';git push`
     elsif @in_file_or_cmd == 'b'
@@ -91,15 +99,15 @@ def dodo
     else
       parse_now('devlog.markdown', "Parsing devlog.markdown in current folder...".green)
     end
-
- end
- puts "\n\n"
- #puts "\nRealtime: #{time}sec\n\n"
+  end
+  puts "\n\n"
+  puts "\nRealtime: #{time}sec\n\n"
 end
-#devlog run
+
+# devlog run
 begin
   dodo
-rescue Exception => e
-    puts "\nRuntime exception: #{e.message.to_s.blue}\n"
-    print_usage
+rescue StandardError => e
+  puts "\nRuntime exception: #{e.message.to_s.blue}\nBacktrace:\n#{print_backtrace(e)}"
+  print_usage
 end

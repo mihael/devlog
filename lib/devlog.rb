@@ -62,6 +62,8 @@ module Devlog
   def parse_datetime(line)
     parts = line[1..-1].split
     DateTime.strptime("#{parts[0]} #{parts[1]}", DATETIME_FORMAT)
+  rescue StandardError => e
+    abort "\nError\nCan not parse line with invalid date:\n\n#{line}".to_s.blue
   end
 
   def parse_devlog_now(devlog=nil)

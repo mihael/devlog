@@ -1,7 +1,6 @@
 require 'test_helper'
 
 class DevlogTest < Test::Unit::TestCase
-
   def test_empty_devlog
     @tajm = parse_devlog(File.join(File.dirname(__FILE__), '..', 'empty_devlog.markdown'))
     puts "#{@tajm.coding_session_time} #{@tajm.com_session_time} #{@tajm.payed_time}"
@@ -33,6 +32,12 @@ class DevlogTest < Test::Unit::TestCase
     assert(@tajm_test.payed_time==-1, "wrong payed time")
     assert(@tajm_test.unpayed_time==4.5, "wrong unpayed wrong")
     assert(@tajm_test.charge_time==5.5, "wrong charge wrong")
+  end
+
+  def test_devlog_invalid_date
+    assert_raise(SystemExit) do
+      parse_devlog_now(File.join(File.dirname(__FILE__), '..', 'test_invalid_date_devlog.markdown'))
+    end
   end
 
   def test_p_session_time
@@ -111,7 +116,6 @@ class DevlogTest < Test::Unit::TestCase
     load_devlog_stat
     hours = @tajm_stat.hours_for_last(1, parse_datetime("#09.03.2014 11:00:00"))
     assert(hours==1, "should be 1, but is #{hours}")
-
   end
 
   def test_session_count
@@ -199,5 +203,4 @@ class DevlogTest < Test::Unit::TestCase
     end
     File.delete(@exported_devlog) if File.exist?(@exported_devlog)
   end
-
 end

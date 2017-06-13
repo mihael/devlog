@@ -1,3 +1,11 @@
+#13.06.2017 23:59:11 CodingSession::END
+
+doing some cleanup... have a bunch of Issues that need to be implemented.
+
+but starting with invalid date parsing problem, want to see the line that caused it. done.
+
+#13.06.2016 22:30:56 CodingSession::BEGIN
+
 #24.01.2016 20:44:45 CodingSession::END
 
 ii can now export the devlog. the top session becomes the bottom one, and a human can read the devlog like a book: top down...
