@@ -2,7 +2,7 @@ require 'test_helper'
 
 class DevlogTest < Test::Unit::TestCase
   def test_empty_devlog
-    @tajm = parse_devlog(File.join(File.dirname(__FILE__), '..', 'empty_devlog.markdown'))
+    @tajm = parse_devlog_now(File.join(File.dirname(__FILE__), '..', 'empty_devlog.markdown'))
     puts "#{@tajm.coding_session_time} #{@tajm.com_session_time} #{@tajm.payed_time}"
     assert(@tajm.coding_session_time==0, "time is money is love")
     assert(@tajm.com_session_time==0, "selftalk")
@@ -166,7 +166,7 @@ class DevlogTest < Test::Unit::TestCase
     start_coding_session(@empty_devlog)
     assert(File.readlines(@empty_devlog).grep(/CodingSession::BEGIN/).size>0, "should insert CodingSession::BEGIN at top of file")
     assert(is_session_open(@empty_devlog)==true, "should be true, session should be open after starting")
-    prepend_string('+1h', @empty_devlog)
+    prepend_string(@empty_devlog, '+1h')
     sleep(1)
     stop_coding_session(@empty_devlog)
     assert(File.readlines(@empty_devlog).grep(/CodingSession::END/).size>0, "should insert CodingSession::END at top of file")

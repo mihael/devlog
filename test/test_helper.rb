@@ -10,7 +10,7 @@ class Test::Unit::TestCase
 end
 
 def load_devlog
-  @tajm = parse_devlog(File.join(File.dirname(__FILE__), '..', 'devlog.markdown'))
+  @tajm = parse_devlog_now(File.join(File.dirname(__FILE__), '..', 'devlog.markdown'))
   puts "#{@tajm.coding_session_time} #{@tajm.com_session_time} #{@tajm.payed_time}"
   assert(@tajm.coding_session_time>0, "no time no money no love")
   assert(@tajm.com_session_time>0, "no selftalk")
