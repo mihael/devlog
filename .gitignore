@@ -10,10 +10,12 @@ rdoc
 spec/reports
 test/tmp
 test/version_tmp
-tmp
+.DS_STORE
 
 # YARD artifacts
 .yardoc
 _yardoc
 doc/
 info.markdown
+devlog_purepoint.markdown
+devlog_book.markdown

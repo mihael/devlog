@@ -2,7 +2,7 @@ require 'test_helper'
 
 class DevlogTest < Test::Unit::TestCase
   def test_empty_devlog
-    @tajm = parse_devlog_now(File.join(File.dirname(__FILE__), '..', 'empty_devlog.markdown'))
+    @tajm = parse_devlog_now(File.join(File.dirname(__FILE__), TEST_FILES_PATH, 'empty_devlog.markdown'))
     puts "#{@tajm.coding_session_time} #{@tajm.com_session_time} #{@tajm.payed_time}"
     assert(@tajm.coding_session_time==0, "time is money is love")
     assert(@tajm.com_session_time==0, "selftalk")
@@ -36,7 +36,7 @@ class DevlogTest < Test::Unit::TestCase
 
   def test_devlog_invalid_date
     assert_raise(SystemExit) do
-      parse_devlog_now(File.join(File.dirname(__FILE__), '..', 'test_invalid_date_devlog.markdown'))
+      parse_devlog_now(File.join(File.dirname(__FILE__), TEST_FILES_PATH, 'test_invalid_date_devlog.markdown'))
     end
   end
 
@@ -140,7 +140,7 @@ class DevlogTest < Test::Unit::TestCase
   end
 
   def test_start_coding_session
-    @empty_devlog = File.join(File.dirname(__FILE__), '..', 'tmp1_devlog.markdown')
+    @empty_devlog = File.join(File.dirname(__FILE__), TEMP_PATH, 'tmp1_devlog.markdown')
     File.open(@empty_devlog, 'w') {|f| f.puts('empty')}
     start_coding_session(@empty_devlog)
     assert(File.readlines(@empty_devlog).grep(/CodingSession::BEGIN/).size>0, "should insert CodingSession::BEGIN at top of file")
@@ -149,7 +149,7 @@ class DevlogTest < Test::Unit::TestCase
   end
 
   def test_stop_coding_session
-    @empty_devlog = File.join(File.dirname(__FILE__), '..', 'tmp2_devlog.markdown')
+    @empty_devlog = File.join(File.dirname(__FILE__), TEMP_PATH, 'tmp2_devlog.markdown')
     File.delete(@empty_devlog) if File.exist?(@empty_devlog)
     File.open(@empty_devlog, 'w') {|f| f.puts('empty')}
     stop_coding_session(@empty_devlog)
@@ -159,8 +159,8 @@ class DevlogTest < Test::Unit::TestCase
   end
 
   def test_save_info_after_stop_coding_session
-    @devlog_info  = File.join(File.dirname(__FILE__), '..', 'info.markdown')
-    @empty_devlog = File.join(File.dirname(__FILE__), '..', 'tmp3_devlog.markdown')
+    @devlog_info  = File.join(File.dirname(__FILE__), TEMP_PATH, 'info.markdown')
+    @empty_devlog = File.join(File.dirname(__FILE__), TEMP_PATH, 'tmp3_devlog.markdown')
     #File.delete(@empty_devlog) if File.exist?(@empty_devlog)
     File.new(@empty_devlog, 'w').puts('\n')
     start_coding_session(@empty_devlog)
@@ -181,14 +181,14 @@ class DevlogTest < Test::Unit::TestCase
   end
 
   def test_is_session_open
-    @closed_devlog = File.join(File.dirname(__FILE__), '..', 'test_devlog.markdown')
+    @closed_devlog = File.join(File.dirname(__FILE__), TEST_FILES_PATH, 'test_devlog.markdown')
     assert(is_session_open(@closed_devlog)==false, "should be false, session should be closed")
-    @open_devlog = File.join(File.dirname(__FILE__), '..', 'test_open_devlog.markdown')
+    @open_devlog = File.join(File.dirname(__FILE__), TEST_FILES_PATH, 'test_open_devlog.markdown')
     assert(is_session_open(@open_devlog)==true, "should be true, session should be open")
   end
 
   def test_devlog_export
-    @exported_devlog = export_devlog_now(File.join(File.dirname(__FILE__), '..', 'test_devlog_export.markdown'))
+    @exported_devlog = export_devlog_now(File.join(File.dirname(__FILE__), TEST_FILES_PATH, 'test_devlog_export.markdown'))
     assert(File.exists?(@exported_devlog))
     assert(File.size(@exported_devlog)>0, "file should not be empty")
     File.open(@exported_devlog, "r") do |f|
