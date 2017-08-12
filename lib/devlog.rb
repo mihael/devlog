@@ -1,6 +1,7 @@
 #require "time"
 #require "date"
 require "active_support/all"
+require "devlog_settings"
 
 # Colors for devlog
 class String
