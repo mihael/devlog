@@ -61,8 +61,13 @@ end
 
 def dodo
   include Devlog
+  load_settings('devlog.yml')
   time = Benchmark.realtime do
-    if @in_file_or_cmd == 'help'
+    if @in_file_or_cmd =~ /.(markdown|md)$/
+      @settings = nil
+      load_settings(File.join(@in_file_or_cmd.split('.').first, '.yml'))
+      parse_now(@in_file_or_cmd, "Parsing #{@in_file_or_cmd}...".red)
+    elsif @in_file_or_cmd == 'help'
       print_usage
     elsif @in_file_or_cmd == 'x'
       export_now('devlog.markdown', "Exporting devlog.markdown in current folder...".green)
@@ -94,8 +99,6 @@ def dodo
       `git commit -am "devlog" && git push`
     elsif @in_file_or_cmd == 's'
       puts is_session_open("devlog.markdown") ? "Session is open..." : "No open session."
-    elsif @in_file_or_cmd =~ /markdown/
-      parse_now(@in_file_or_cmd, "Parsing #{@in_file_or_cmd}...".red)
     else
       parse_now('devlog.markdown', "Parsing devlog.markdown in current folder...".green)
     end
