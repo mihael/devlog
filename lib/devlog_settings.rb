@@ -1,10 +1,10 @@
 require 'yaml'
 require 'ostruct'
-#require 'pry'
+require 'pry'
 
 #
 module Devlog
-  # Settings - keep it simple: lower_case: one_level_only
+  # Settings - keeping it simple.
   # Allow settings.key besides settings[:key]
   # If the method name exists as a key within this Hash, fetch it.
   class Settings < Hash
@@ -20,12 +20,25 @@ module Devlog
   end
 
   def load_settings(file)
-    @settings = Settings[YAML.load_file(file)]
-  rescue
-    # Please add devlog.yml to configure.
+    yaml = YAML.load_file(file)
+    @settings = yaml ? Settings[yaml] : Settings.new
   end
 
   def settings
     @settings
+  end
+
+  # The default is the current folder with devlog.markdown in it.
+  DEVLOG_FILE = 'devlog.markdown'.freeze
+
+  # Calculate a devlog_file path.
+  def devlog_file_setting
+    return DEVLOG_FILE unless @settings
+    devlog_file_setting = @settings['devlog_file']
+    if devlog_file_setting && File.exists?(File.join(Dir.pwd, devlog_file_setting))
+      devlog_file_setting
+    else
+      DEVLOG_FILE
+    end
   end
 end

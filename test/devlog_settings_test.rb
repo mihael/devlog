@@ -24,8 +24,13 @@ class DevlogSettingsTest < Test::Unit::TestCase
   end
 
   def test_loading_from_yaml
-    assert(settings.devlog_file == 'devlog.markdown',
-           'example_setting should be loaded')
+    assert(settings.devlog_file == 'development_log.markdown',
+           'example setting should be loaded')
+  end
+
+  def test_devlog_file_setting_returns_default_when_overriden_devlog_file_does_not_exist
+    assert(devlog_file_setting == 'devlog.markdown',
+           'default setting should be returned, since the example setting does not exist')
   end
 
   def test_nested_settings_are_possible_but_not_encouraged
