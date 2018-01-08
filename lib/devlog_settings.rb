@@ -1,6 +1,6 @@
 require 'yaml'
 require 'ostruct'
-#require 'pry'
+require 'pry'
 
 #
 module Devlog
