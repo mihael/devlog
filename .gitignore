@@ -16,6 +16,9 @@ test/version_tmp
 .yardoc
 _yardoc
 doc/
+
 info.markdown
 devlog_purepoint.markdown
 devlog_book.markdown
+.devlog.yml
+*~
