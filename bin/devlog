@@ -59,21 +59,27 @@ def export_now(devlog_file = 'devlog.markdown', msg = '')
   puts "\nExported to #{exported_file}.".yellow
 end
 
+include Devlog
+
 def dodo
-  include Devlog
+  load_settings('.devlog.yml')
+  default_devlog_file = devlog_file_setting
   time = Benchmark.realtime do
-    if @in_file_or_cmd == 'help'
+    if @in_file_or_cmd =~ /.(markdown|md)$/ # devlog_file is passed directly via CLI
+      @settings = nil
+      parse_now(@in_file_or_cmd, "Parsing #{@in_file_or_cmd}!".red)
+    elsif @in_file_or_cmd == 'help'
       print_usage
     elsif @in_file_or_cmd == 'x'
-      export_now('devlog.markdown', "Exporting devlog.markdown in current folder...".green)
+      export_now(default_devlog_file, "Exporting #{default_devlog_file}...".green)
     elsif @in_file_or_cmd == 'commit'
       `git commit -am 'devlog';git push`
     elsif @in_file_or_cmd == 'b'
       puts "CodingSession::BEGIN"
-      start_coding_session("devlog.markdown")
+      start_coding_session(default_devlog_file)
     elsif @in_file_or_cmd == 'e'
       puts "CodingSession::END"
-      stop_coding_session("devlog.markdown")
+      stop_coding_session(default_devlog_file)
     elsif @in_file_or_cmd == 'i'
       puts "Save info.markdown"
       save_info("devlog.markdown")
@@ -85,19 +91,17 @@ def dodo
       `git push`
     elsif @in_file_or_cmd == 'save'
       puts "Save info.markdown and Commit and push git"
-      save_info("devlog.markdown")
+      save_info(default_devlog_file)
       `git commit -am "devlog" && git push`
     elsif @in_file_or_cmd == 'saver'
       puts "Save info.markdown, copy devlog to README.markdown and Commit and push git"
-      save_info("devlog.markdown")
-      save_to_readme("devlog.markdown")
+      save_info(default_devlog_file)
+      save_to_readme(default_devlog_file)
       `git commit -am "devlog" && git push`
     elsif @in_file_or_cmd == 's'
-      puts is_session_open("devlog.markdown") ? "Session is open..." : "No open session."
-    elsif @in_file_or_cmd =~ /markdown/
-      parse_now(@in_file_or_cmd, "Parsing #{@in_file_or_cmd}...".red)
+      puts is_session_open(default_devlog_file) ? "Session is open..." : "No open session."
     else
-      parse_now('devlog.markdown', "Parsing devlog.markdown in current folder...".green)
+      parse_now(default_devlog_file, "Parsing #{default_devlog_file}...".green)
     end
   end
   puts "\n\n"

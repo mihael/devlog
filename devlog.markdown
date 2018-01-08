@@ -1,3 +1,21 @@
+#08.01.2018 21:56:04 CodingSession::END
+
+doing some more work on settings.
+
+the idea is to optionally have a file with the following name `.devlog.yml` in a folder where You want to work with devlog. this allows writing the devlog in an arbitrary folder relative to the settings file.
+
+ii was also thinking about doing convention, simply always look for a `devlog.markdown` in the current folder, and then one up and so on... but ended up going with a setting. so by default `devlog.markdown` is expected to live in the folder where the CLI command is spawned: `devlog`. if there's a settings file instead, and it overrides `devlog_file` path, then that is used instead (but only if it exists).
+
+done. this is already nice, now I can finally run `devlog` from the project folder and keep my devlog out of it.
+
+now, it would be good to also publish this to the world.
+
+so let's see... this time I can actually create a PR and reference an [issue](https://github.com/mihael/devlog/issues/7) for it.
+
+the new version will be 0.3.0.
+
+#08.01.2018 20:01:28 CodingSession::BEGIN
+
 #14.06.2017 00:28:08 CodingSession::END
 
 ah, well, still not done. cleaning up some more...

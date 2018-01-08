@@ -203,4 +203,8 @@ class DevlogTest < Test::Unit::TestCase
     end
     File.delete(@exported_devlog) if File.exist?(@exported_devlog)
   end
+
+  def test_default_devlog_file_setting
+    assert(devlog_file_setting == 'devlog.markdown', 'should return default')
+  end
 end
