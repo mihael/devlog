@@ -27,4 +27,9 @@ class DevlogSettingsTest < Test::Unit::TestCase
     assert(settings.devlog_file == 'devlog.markdown',
            'example_setting should be loaded')
   end
+
+  def test_nested_settings_are_possible_but_not_encouraged
+    assert_raise(NoMethodError) { settings.nested.setting == 'xyz' }
+    assert(settings.nested['setting'] == 'xyz', 'xyz should be defined')
+  end
 end

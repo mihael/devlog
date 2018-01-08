@@ -1,2 +1,5 @@
 # Override the default location of the_project_folder_path/../info/devlog.markdown
 devlog_file: devlog.markdown
+
+nested:
+  setting: xyz
