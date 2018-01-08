@@ -1,7 +1,7 @@
 source "https://rubygems.org"
-gem "activesupport", ">= 4.1"
+gem "activesupport", "~> 4.1"
 
 group :development, :test do
-  gem "test-unit"
+  gem "test-unit", "~> 3.1"
   gem "jeweler", "~> 2.0"
 end
