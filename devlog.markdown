@@ -1,3 +1,23 @@
+#09.01.2018 23:38:01 CodingSession::BEGIN
+
+resolving a security issue reported by github. bumping nokogiri.
+
+and also removed Gemfile.lock, since Gemfile should use gemspec.
+
+but now am having some trouble with Travis and the generated gemspec... jeweler 2.0.1 adds devlog as a dependency when using `gemspec` in the Gemfile.
+
+seems to fix by removing `gemspec` from the Gemfile.
+
+still not decided, am thinking:
+
+1. auto-generate the .devlog.yml if it does not exist? nope
+2. generate the .devlog.yml file after a special command `devlog init`? > much better
+3. if there's no .devlog.yml file suggest to user to run 2. > perfect
+
+2. and 3. it is.
+
+#09.01.2018 20:10:06 CodingSession::BEGIN
+
 #08.01.2018 21:56:04 CodingSession::END
 
 doing some more work on settings.

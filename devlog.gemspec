@@ -68,18 +68,21 @@ Gem::Specification.new do |s|
     s.specification_version = 4
 
     if Gem::Version.new(Gem::VERSION) >= Gem::Version.new('1.2.0') then
-      s.add_runtime_dependency(%q<devlog>, [">= 0"])
+      s.add_runtime_dependency(%q<activesupport>, ["> 4.1"])
       s.add_development_dependency(%q<test-unit>, ["~> 3.1"])
       s.add_development_dependency(%q<jeweler>, ["~> 2.0"])
+      s.add_development_dependency(%q<nokogiri>, ["~> 1.8"])
     else
-      s.add_dependency(%q<devlog>, [">= 0"])
+      s.add_dependency(%q<activesupport>, ["> 4.1"])
       s.add_dependency(%q<test-unit>, ["~> 3.1"])
       s.add_dependency(%q<jeweler>, ["~> 2.0"])
+      s.add_dependency(%q<nokogiri>, ["~> 1.8"])
     end
   else
-    s.add_dependency(%q<devlog>, [">= 0"])
+    s.add_dependency(%q<activesupport>, ["> 4.1"])
     s.add_dependency(%q<test-unit>, ["~> 3.1"])
     s.add_dependency(%q<jeweler>, ["~> 2.0"])
+    s.add_dependency(%q<nokogiri>, ["~> 1.8"])
   end
 end
 
