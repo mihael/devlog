@@ -75,3 +75,20 @@ this one is nice for pushing to a github project, since the CEO can now read the
 run in current folder and write out info.markdown, copy devlog to README.markdown so it is rendered on github project/branch frontpage, then commit&push git repo:
 
 `devlog saver`
+
+settings
+========
+
+currently only `devlog_file` can be configured. it represents the location of the devlog text file.
+
+the settings file is called `.devlog.yml`.
+
+it can be placed into a project folder from where one wants to be able to call `devlog`.
+
+example settings `.devlog.yml`:
+
+```
+devlog_file: ../info/devlog.markdown
+```
+
+the file path should be relative to `.devlog.yml`.
