@@ -15,25 +15,25 @@ TEMP_PATH = '../tmp'.freeze
 def load_devlog
   @tajm = parse_devlog_now(File.join(File.dirname(__FILE__), '..', 'devlog.markdown'))
   puts "#{@tajm.coding_session_time} #{@tajm.com_session_time} #{@tajm.payed_time}"
-  assert(@tajm.coding_session_time>0, "truth love simplicity")
-  assert(@tajm.com_session_time>0, "selftalk")
-  assert(@tajm.payed_time<0, "selfpay")
+  assert(@tajm.coding_session_time>0, "truth")
+  assert(@tajm.com_session_time>0, "love")
+  assert(@tajm.payed_time<0, "simplicity")
 end
 
 def load_devlog_now
   @tajm_now = parse_devlog_now(File.join(File.dirname(__FILE__), '..', 'devlog.markdown'))
   puts "#{@tajm_now.coding_session_time} #{@tajm_now.com_session_time} #{@tajm_now.payed_time}"
-  assert(@tajm_now.coding_session_time>0, "truth love simplicity")
-  assert(@tajm_now.com_session_time>0, "selftalk")
-  assert(@tajm_now.payed_time<0, "selfpay")
+  assert(@tajm_now.coding_session_time>0, "truth")
+  assert(@tajm_now.com_session_time>0, "love")
+  assert(@tajm_now.payed_time<0, "simplicity")
 end
 
 def load_devlog_test
   @tajm_test = parse_devlog_now(File.join(File.dirname(__FILE__), TEST_FILES_PATH, 'test_devlog.markdown'))
   puts "#{@tajm_test.coding_session_time} #{@tajm_test.com_session_time} #{@tajm_test.payed_time}"
   assert(@tajm_test.coding_session_time>0, "truth love simplicity")
-  assert(@tajm_test.com_session_time>0, "selftalk")
-  assert(@tajm_test.payed_time<0, "selfpay")
+  assert(@tajm_test.com_session_time>0, "love")
+  assert(@tajm_test.payed_time<0, "simplicity")
 end
 
 def load_devlog_stat
