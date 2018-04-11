@@ -31,7 +31,7 @@ end
 def load_devlog_test
   @tajm_test = parse_devlog_now(File.join(File.dirname(__FILE__), TEST_FILES_PATH, 'test_devlog.markdown'))
   puts "#{@tajm_test.coding_session_time} #{@tajm_test.com_session_time} #{@tajm_test.payed_time}"
-  assert(@tajm_test.coding_session_time>0, "truth love simplicity")
+  assert(@tajm_test.coding_session_time>0, "truth")
   assert(@tajm_test.com_session_time>0, "love")
   assert(@tajm_test.payed_time<0, "simplicity")
 end
