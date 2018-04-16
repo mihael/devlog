@@ -1,4 +1,4 @@
-#09.01.2018 23:38:01 CodingSession::BEGIN
+#09.01.2018 23:38:01 CodingSession::END
 
 resolving a security issue reported by github. bumping nokogiri.
 
