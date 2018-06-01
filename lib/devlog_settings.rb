@@ -20,7 +20,11 @@ module Devlog
   end
 
   def load_settings(file)
-    yaml = YAML.load_file(file)
+    begin
+      yaml = YAML.load_file(file)
+    rescue
+      yaml = nil
+    end
     @settings = yaml ? Settings[yaml] : Settings.new
   end
 
