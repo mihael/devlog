@@ -223,5 +223,33 @@ class DevlogTest < Test::Unit::TestCase
     zezzions = @tajm_weekly.zezzions_for_week(2, DateTime.new(2019, 9, 11, 18, 0, 0))
 
     assert(zezzions.size == 1, "should be 1 but is #{zezzions.size}")
+
+    zezzions = @tajm_weekly.zezzions_for_week(0, DateTime.new(2019, 9, 6, 23, 0, 0))
+
+    assert(zezzions.size == 10, "should be 10 but is #{zezzions.size}")
+  end
+
+  def test_weekly_timesheet_html_generation
+    load_devlog_weekly
+
+    @sevendays = Sevendays.new(@tajm_weekly.zezzions_for_week(0, DateTime.new(2019, 9, 6, 23, 0, 0)))
+
+    assert(@sevendays.monday.begins_at == "08:00", "monday should begin at 08:00 but begins at #{@sevendays.monday.begins_at}")
+    assert(@sevendays.monday.ends_at == "16:00", "monday should end at 16:00 but ends at #{@sevendays.monday.ends_at}")
+
+    assert(@sevendays.tuesday.begins_at == "08:00", "tuesday should begin at 08:00 but begins at #{@sevendays.tuesday.begins_at}")
+    assert(@sevendays.tuesday.ends_at == "22:00", "tuesday should end at 22:00 but ends at #{@sevendays.tuesday.ends_at}")
+
+    assert(@sevendays.friday.begins_at == "08:00", "friday should begin at 08:00 but begins at #{@sevendays.friday.begins_at}")
+    assert(@sevendays.friday.ends_at == "18:00", "friday should end at 18:00 but ends at #{@sevendays.friday.ends_at}")
+
+    assert(@sevendays.begins_at == "2019/09/02", "seven days should begin on 2019/09/02 but beings on #{@sevendays.begins_at}")
+
+    assert(@sevendays.sunday.breaks_at == "", "no breaks on sunday but is: #{@sevendays.sunday.breaks_at}")
+
+    assert(@sevendays.friday.breaks_at == "12:00 -> 14:00", "one break on friday but is: #{@sevendays.friday.breaks_at}")
+
+    assert(@sevendays.tuesday.breaks_at == "12:00 -> 13:00, 15:00 -> 20:00", "two breaks on tuesday but is: #{@sevendays.tuesday.breaks_at}")
+
   end
 end

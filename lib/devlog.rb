@@ -294,6 +294,86 @@ module Devlog
     devlog_export_file
   end
 
+  def weekly_pdf(tajm, week = 0, devlog_file = 'devlog.markdown')
+    require 'erb'
+    devlog_file = settings.devlog_file || devlog_file
+    template = settings.respond_to?(:weekly_timesheet_template) ? settings.weekly_timesheet_template : File.join(Devlog.path, 'templates', 'timesheets', 'weekly_timesheet.erb.html')
+    now = "1" #DateTime.current
+    pdf = File.join(File.dirname(devlog_file), "sevendays-#{now.to_s}.pdf")
+    html = File.join(File.dirname(devlog_file), "sevendays-#{now.to_s}.html")
+    zezzions = tajm.zezzions_for_week(week, DateTime.current)
+    if zezzions.any?
+      @sevendays = Sevendays.new(zezzions)
+      renderer = ERB.new(File.read(template))
+
+      File.open(html,'w') {|f| f.write(renderer.result()) }
+
+      `wkhtmltopdf #{html} #{pdf}`
+    else
+      'No sessions to render.'.red
+    end
+  end
+
+  class Day
+    def initialize(zezzions)
+      @all = zezzions.sort # sorting by default by zzbegin
+    end
+
+    def total_hours
+      @all.inject(0) { |time, zezzion| time + zezzion.session_time }.round(2) # todo: extract from parsing too
+    end
+
+    def begins_at
+      @all.first.zzbegin.strftime('%H:%M')
+    end
+
+    def ends_at
+      @all.last.zzend.strftime("%H:%M")
+    end
+
+    def breaks_at
+      size = @all.size
+
+      return "" if size < 2
+
+      breaks = []
+      first = true
+      last = nil
+
+      @all.each do |zezzion|
+        if first
+          last = zezzion
+          first = false
+        else
+          breaks << "#{last.zzend.strftime('%H:%M')} -> #{zezzion.zzbegin.strftime('%H:%M')}"
+          last = zezzion
+        end
+      end
+
+      breaks.join(', ')
+    end
+  end
+
+  class Sevendays
+    def initialize(zezzions)
+      @all = zezzions.sort
+    end
+
+    def begins_at
+      @all.first.zzbegin.strftime("%Y/%m/%d")
+    end
+
+    def date
+      DateTime.current.strftime("%Y/%m/%d")
+    end
+
+    %i(monday tuesday wednesday thursday friday saturday sunday).each do |day|
+      define_method(day) do
+        Day.new( @all.select { |zezzion| zezzion.zzbegin.send("#{day.to_s}?") } )
+      end
+    end
+  end
+
   # The parsing object
   class Parsing
     # this is the total time, but each session has these same params
@@ -502,6 +582,8 @@ module Devlog
   end
 
   class Zezzion
+    include Comparable
+
     COM = 1 # communication session
     COD = 0 # coding session
     attr_accessor :zzbegin, :zzend, :zzbegin_title, :zzend_title, :zztype
@@ -520,6 +602,10 @@ module Devlog
       @payed_time = 0.0
       @zzbegin_line_number = 0
       @zzend_line_number = 0
+    end
+
+    def <=>(other)
+      zzbegin <=> other.zzbegin
     end
 
     # in seconds
