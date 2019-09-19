@@ -297,8 +297,8 @@ module Devlog
   def weekly_pdf(tajm, week = 0, devlog_file = 'devlog.markdown')
     require 'erb'
     devlog_file = settings.devlog_file || devlog_file
-    template = settings.respond_to?(:weekly_timesheet_template) ? settings.weekly_timesheet_template : File.join(Devlog.path, 'templates', 'timesheets', 'weekly_timesheet.erb.html')
-    now = "1" #DateTime.current
+    template = settings.respond_to?(:weekly_timesheet_template) ? settings.weekly_timesheet_template : File.join(Devlog.path, 'templates', 'weekly_timesheet.erb.html')
+    now = DateTime.current
     pdf = File.join(File.dirname(devlog_file), "sevendays-#{now.to_s}.pdf")
     html = File.join(File.dirname(devlog_file), "sevendays-#{now.to_s}.html")
     zezzions = tajm.zezzions_for_week(week, DateTime.current)
