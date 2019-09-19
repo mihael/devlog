@@ -31,6 +31,11 @@ exporting devlog into a book, which can be read top down, like normal books:
 
   #{'devlog'.green} x ~ exports into devlog.txt
 
+reporting devlog as a timesheet PDF:
+
+  #{'devlog'.green} w ~ export a the current weekly timesheet into a PDF
+
+
 EOF
 
 # arguments
@@ -51,6 +56,7 @@ def parse_now(devlog_file = 'devlog.markdown', msg = '')
   puts t.validation_string
   puts t.to_info_string
   puts is_session_open(devlog_file) ? "\nSession is open...".yellow : "\nNo open session.".green
+  t
 end
 
 def export_now(devlog_file = 'devlog.markdown', msg = '')
@@ -72,6 +78,8 @@ def dodo
       print_usage
     elsif @in_file_or_cmd == 'x'
       export_now(default_devlog_file, "Exporting #{default_devlog_file}...".green)
+    elsif @in_file_or_cmd == 'w'
+      weekly_pdf(parse_now(default_devlog_file, "Parsing #{default_devlog_file}...".green))
     elsif @in_file_or_cmd == 'commit'
       `git commit -am 'devlog';git push`
     elsif @in_file_or_cmd == 'b'
