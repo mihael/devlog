@@ -57,7 +57,9 @@ Gem::Specification.new do |s|
     "test/test_devlogs/test_single_devlog.markdown",
     "test/test_devlogs/test_stats_devlog.markdown",
     "test/test_helper.rb",
-    "tmp/.gitignore"
+    "tmp/.gitignore",
+    "templates/weekly_timesheet.erb.html",
+    "templates/background.jpg"
   ]
   s.homepage = "http://github.com/mihael/devlog".freeze
   s.licenses = ["MIT".freeze]
