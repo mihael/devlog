@@ -1,0 +1,67 @@
+<html>
+<head><meta http-equiv=Content-Type content="text/html; charset=UTF-8">
+<style type="text/css">
+<!--
+span.cls_005{font-family:Arial,serif;font-size:10.1px;color:rgb(118,112,113);font-weight:normal;font-style:normal;text-decoration: none}
+div.cls_005{font-family:Arial,serif;font-size:10.1px;color:rgb(118,112,113);font-weight:normal;font-style:normal;text-decoration: none}
+span.cls_003{font-family:Arial,serif;font-size:11.1px;color:rgb(118,112,113);font-weight:bold;font-style:normal;text-decoration: none}
+div.cls_003{font-family:Arial,serif;font-size:11.1px;color:rgb(118,112,113);font-weight:bold;font-style:normal;text-decoration: none}
+span.cls_006{font-family:Arial,serif;font-size:11.1px;color:rgb(118,112,113);font-weight:normal;font-style:normal;text-decoration: none}
+div.cls_006{font-family:Arial,serif;font-size:11.1px;color:rgb(118,112,113);font-weight:normal;font-style:normal;text-decoration: none}
+-->
+
+.time {
+  font-family:Arial,serif;font-size:8px;color:rgb(118,112,113);font-weight:bold;font-style:normal;text-decoration: none
+}
+</style>
+</head>
+<body>
+<div style="position:absolute;left:50%;margin-left:-420px;top:0px;width:841px;height:595px;overflow:hidden">
+<div style="position:absolute;left:0px;top:0px">
+<img src="background.jpg" width=841 height=589></div>
+<div style="position:absolute;left:441.59px;top:158.60px" class="cls_005"><span class="cls_005">Clients Name</span></div>
+<div style="position:absolute;left:441.59px;top:173.71px" class="cls_005"><span class="cls_005">Contract Number</span></div>
+<div style="position:absolute;left:441.59px;top:189.07px" class="cls_005"><span class="cls_005">Consultancy Company Name</span></div>
+<div style="position:absolute;left:53.51px;top:191.72px" class="cls_003"><span class="cls_003">WEEK COMMENCING</span></div>
+  <div style="position:absolute;left:225px;top:193.72px" class="cls_006"><span class="time week-comencing"><%= @sevendays.begins_at %></span></div>
+
+
+<div style="position:absolute;left:441.59px;top:204.19px" class="cls_005"><span class="cls_005">Consultants Name</span></div>
+
+
+<!-- The weekly timesheet table -->
+<div style="position:absolute;left:54.71px;top:234.44px" class="cls_003"><span class="cls_003">DAY</span></div>
+<div style="position:absolute;left:146.39px;top:234.44px" class="cls_003"><span class="cls_003">START TIME</span></div>
+<div style="position:absolute;left:252.71px;top:234.44px" class="cls_003"><span class="cls_003">BREAK/S START & FINISH</span></div>
+<div style="position:absolute;left:578.87px;top:234.44px" class="cls_003"><span class="cls_003">END TIME</span></div>
+<div style="position:absolute;left:685.19px;top:234.44px" class="cls_003"><span class="cls_003">TOTAL HOURS</span></div>
+
+<% top = 253 %>
+<% %w[monday tuesday wednesday thursday friday saturday sunday].each do |day| %>
+  <% dayname = day.upcase %>
+  <div style="position:absolute;left:54.71px;top:<%= top.to_s %>" class="cls_006"><span class="cls_006"><%= dayname %></span></div>
+    <div style="position:absolute;left:146.39px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> start-time"><%= @sevendays.send(day.to_sym).begins_at %></span></div>
+    <div style="position:absolute;left:252.7px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> breaks"><%= @sevendays.send(day.to_sym).breaks_at %></span></div>
+    <div style="position:absolute;left:578.8px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> end-time"><%= @sevendays.send(day.to_sym).ends_at %></span></div>
+    <div style="position:absolute;left:685.19px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> total-hours"><%= @sevendays.send(day.to_sym).total_hours %></span></div>
+  <% top += 10 %>
+<%end%>
+
+<div style="position:absolute;left:55.43px;top:380.83px" class="cls_006"><span class="cls_006">Notes Regarding Overtime or Expenses:</span></div>
+<div style="position:absolute;left:54.71px;top:450.43px" class="cls_006"><span class="cls_006">Signed by Consultant</span></div>
+  <div style="position:absolute;left:200.71px;top:450.43px" class="cls_006"><span class="cls_006"></span></div>
+
+<div style="position:absolute;left:467.03px;top:451.88px" class="cls_006"><span class="cls_006">Signed by Client</span></div>
+<div style="position:absolute;left:54.71px;top:468.67px" class="cls_006"><span class="cls_006">Print Name</span></div>
+  <div style="position:absolute;left:200.71px;top:468.67px" class="cls_006"><span class="cls_006"></span></div>
+
+<div style="position:absolute;left:467.03px;top:471.32px" class="cls_006"><span class="cls_006">Job Title</span></div>
+<div style="position:absolute;left:54.71px;top:488.83px" class="cls_006"><span class="cls_006">Date</span></div>
+  <div style="position:absolute;left:200px;top:488.83px" class="cls_006"><span class="date"><%= @sevendays.date %></span></div>
+<div style="position:absolute;left:467.03px;top:491.71px" class="cls_006"><span class="cls_006">Print Name</span></div>
+<div style="position:absolute;left:467.03px;top:511.16px" class="cls_006"><span class="cls_006">Date</span></div>
+</div>
+</body>
+</html>
+
+
