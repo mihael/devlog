@@ -1,3 +1,12 @@
+#19.09.2019 23:34:08 CodingSession::END
+
+adding something ii need for a dayjob. at end of period employer wants a timesheet filled out.
+ii have no intent to do that manually ever again.
+
+weekly daily report, ...
+
+#19.09.2019 22:00:17 CodingSession::BEGIN
+
 #09.01.2018 23:38:01 CodingSession::END
 
 resolving a security issue reported by github. bumping nokogiri.
