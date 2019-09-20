@@ -207,4 +207,21 @@ class DevlogTest < Test::Unit::TestCase
   def test_default_devlog_file_setting
     assert(devlog_file_setting == 'devlog.markdown', 'should return default')
   end
+
+  def test_zezzions_for_week
+    load_devlog_weekly
+    assert(@tajm_weekly.devlog_sessions.size==15, "should be 15, but is #{@tajm_weekly.devlog_sessions.size}")
+
+    zezzions = @tajm_weekly.zezzions_for_week(0, DateTime.new(2019, 9, 11, 18, 0, 0))
+
+    assert(zezzions.size == 4, 'should be 4 but is not')
+
+    zezzions = @tajm_weekly.zezzions_for_week(1, DateTime.new(2019, 9, 11, 18, 0, 0))
+
+    assert(zezzions.size == 10, "should be 10 but is #{zezzions.size}")
+
+    zezzions = @tajm_weekly.zezzions_for_week(2, DateTime.new(2019, 9, 11, 18, 0, 0))
+
+    assert(zezzions.size == 1, "should be 1 but is #{zezzions.size}")
+  end
 end
