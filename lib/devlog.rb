@@ -379,12 +379,28 @@ module Devlog
       (coding_session_time + com_session_time + payed_time).round(2)
     end
 
-    # return hours worked for the last X days, from beginTime
-    def hours_for_last(days, beginTime = DateTime.now)
-      endTime = beginTime.to_time - days.days
-      selected_zezzions = @zezzions.select { |z| z.zzbegin.to_time < beginTime && z.zzend >= endTime }
-      # puts("Selected sessons from #{beginTime} to #{endTime}: #{selected_zezzions.size}")
+    # return hours worked for the last X days, from current_time
+    def hours_for_last(days, current_time = DateTime.now)
+      endTime = current_time.to_time - days.days
+      selected_zezzions = @zezzions.select { |z| z.zzbegin.to_time < current_time && z.zzend >= endTime }
+      #puts("Selected sessons from #{current_time} to #{endTime}: #{selected_zezzions.size}")
       selected_zezzions.inject(0) { |time, z| time + z.session_time }.round(2)
+    end
+
+    # from time to time select some zezzions
+    def select_zezzions(from_time, to_time)
+      @zezzions.select { |z| z.zzbegin.to_time > from_time && z.zzend.to_time <= to_time }
+    end
+
+    # returns zezzions recorded during beginning of week and end of week
+    # fromnow - how many weeks into the past
+    def zezzions_for_week(fromnow = 0, current_time = DateTime.current)
+      moment = current_time - (7 * fromnow).days
+      begin_time = moment.beginning_of_week
+      end_time = moment.end_of_week
+
+      puts("current_time: #{current_time} from_time: #{begin_time} to_time:#{end_time} moment: #{moment}")
+      selected_zezzions = select_zezzions(begin_time, end_time)
     end
 
     def longest_session
