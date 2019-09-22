@@ -298,7 +298,7 @@ module Devlog
     require 'erb'
     devlog_file = settings.devlog_file || devlog_file
     template = settings.respond_to?(:weekly_timesheet_template) ? settings.weekly_timesheet_template : File.join(Devlog.path, 'templates', 'weekly_timesheet.erb.html')
-    now = DateTime.current
+    now = DateTime.current.strftime('%Y-%m-%d')
     pdf = File.join(File.dirname(devlog_file), "sevendays-#{now.to_s}.pdf")
     html = File.join(File.dirname(devlog_file), "sevendays-#{now.to_s}.html")
     zezzions = tajm.zezzions_for_week(week, DateTime.current)

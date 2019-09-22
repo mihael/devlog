@@ -1,3 +1,19 @@
+#23.09.2019 01:04:21 CodingSession::END
+
+took me some time to decide how to do this.
+
+decided to generate a html from the pdf they gave.
+
+that was easy, but turned out as rubbish, so ii did it manually.
+
+then decided to populate that html with the data.
+
+and then decided to use wkhtmltopdf command line utility to convert the html back to pdf.
+
+have something, and it's configurable by devlogger. will need some more grind and polish.
+
+#22.09.2019 19:05:17 CodingSession::BEGIN
+
 #19.09.2019 23:34:08 CodingSession::END
 
 adding something ii need for a dayjob. at end of period employer wants a timesheet filled out.
