@@ -38,12 +38,13 @@ div.cls_006{font-family:Arial,serif;font-size:11.1px;color:rgb(118,112,113);font
 
 <% top = 251 %>
 <% %w[monday tuesday wednesday thursday friday saturday sunday].each do |day| %>
+  <% current_day = @sevendays.send(day.to_sym) %>
   <% dayname = day.upcase %>
   <div style="position:absolute;left:54.71px;top:<%= top.to_s %>px" class="cls_006"><span class="cls_006"><%= dayname %></span></div>
-    <div style="position:absolute;left:146.39px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> start-time"><%= @sevendays.send(day.to_sym).begins_at %></span></div>
-    <div style="position:absolute;left:252.7px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> breaks"><%= @sevendays.send(day.to_sym).breaks_at %></span></div>
-    <div style="position:absolute;left:578.8px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> end-time"><%= @sevendays.send(day.to_sym).ends_at %></span></div>
-    <div style="position:absolute;left:685.19px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> total-hours"><%= @sevendays.send(day.to_sym).total_hours %></span></div>
+    <div style="position:absolute;left:146.39px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> start-time"><%= current_day.begins_at %></span></div>
+    <div style="position:absolute;left:252.7px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> breaks"><%= current_day.breaks_at %></span></div>
+    <div style="position:absolute;left:578.8px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> end-time"><%= current_day.ends_at %></span></div>
+    <div style="position:absolute;left:685.19px;top:<%= top.to_s %>px" class="cls_006"><span class="time <%= day %> total-hours"><%= current_day.total_hours %></span></div>
   <% top += 16 %>
 <%end%>
 
