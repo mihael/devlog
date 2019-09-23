@@ -300,13 +300,14 @@ module Devlog
     template = settings.has?(:weekly_timesheet_template) ? settings.weekly_timesheet_template : File.join(Devlog.path, 'templates', 'weekly_timesheet.erb.html')
     puts "Using weekly template: #{template} #{settings.has?(:weekly_timesheet_template)}".green
 
-    now = DateTime.current.strftime('%Y-%m-%d')
-    pdf = File.join(File.dirname(devlog_file), "sevendays-#{now.to_s}.pdf")
-    html = File.join(File.dirname(devlog_file), "sevendays-#{now.to_s}.html")
     zezzions = tajm.zezzions_for_week(weeks_from_now, DateTime.current)
 
     if zezzions.any?
+      file_id = zezzions.last.zzbegin.strftime("%Y-%m-%d")
+      pdf = File.join(File.dirname(devlog_file), "sevendays-#{file_id}.pdf")
+      html = File.join(File.dirname(devlog_file), "sevendays-#{file_id}.html")
       @sevendays = Sevendays.new(zezzions)
+
       renderer = ERB.new(File.read(template))
 
       File.open(html,'w') {|f| f.write(renderer.result()) }
@@ -317,35 +318,47 @@ module Devlog
     end
   end
 
+  module SevendaysTotal
+    def total_hours
+      total = all.inject(0) { |time, zezzion| time + zezzion.session_time }.round(2)
+    end
+
+    def total_hours_string
+      total = total_hours
+
+      return "" if total <= 0
+
+      "#{total}h"
+    end
+  end
+
   class Day
-    # dayname: symbol of day, like :monday
-    def initialize(dayname, zezzions)
+    attr_accessor :all
+    include SevendaysTotal
+
+    def initialize(day, zezzions)
       @all = zezzions.sort # sorting by default by zzbegin
-      @dayname = Sevendays::DAYNAMES.include?(dayname) ? dayname : Sevendays::RANDOMDAYNAME
+      @day = Sevendays::DAYS.include?(day) ? day : Sevendays::RANDOMDAY
     end
 
     def any?
-      @all.any?
-    end
-
-    def total_hours
-      @all.inject(0) { |time, zezzion| time + zezzion.session_time }.round(2) # todo: extract from parsing too
+      all.any?
     end
 
     def begins_at
       return '' unless any?
-      @all.first.zzbegin.strftime('%H:%M')
+      all.first.zzbegin.strftime('%H:%M')
     end
 
     def ends_at
       return '' unless any?
-      @all.last.zzend.strftime("%H:%M")
+      all.last.zzend.strftime("%H:%M")
     end
 
     def breaks_at
       return '' unless any?
 
-      size = @all.size
+      size = all.size
 
       return "" if size < 2
 
@@ -353,7 +366,7 @@ module Devlog
       first = true
       last = nil
 
-      @all.each do |zezzion|
+      all.each do |zezzion|
         if first
           last = zezzion
           first = false
@@ -368,26 +381,29 @@ module Devlog
   end
 
   class Sevendays
-    DAYNAMES = %i(monday tuesday wednesday thursday friday saturday sunday).freeze
-    RANDOMDAYNAME = 'Random'.freeze
+    attr_accessor :all
+    include Devlog::SevendaysTotal
+
+    DAYS = %i(monday tuesday wednesday thursday friday saturday sunday).freeze
+    RANDOMDAY = 'Random'.freeze
 
     def initialize(zezzions)
       @all = zezzions.sort
     end
 
     def begins_at
-      @all.first.zzbegin.strftime("%Y/%m/%d")
+      all.first.zzbegin.strftime("%Y/%m/%d")
     end
 
     def date
       DateTime.current.strftime("%Y/%m/%d")
     end
 
-    DAYNAMES.each do |day|
+    DAYS.each do |day|
       attr_accessor day
 
       define_method(day) do
-        value = Day.new(day, @all.select { |zezzion| zezzion.zzbegin.send("#{day.to_s}?") } )
+        value = Day.new(day, all.select { |zezzion| zezzion.zzbegin.send("#{day.to_s}?") } )
         instance_variable_set("@__#{day.to_s}", value) unless instance_variable_get("@__#{day.to_s}")&.any?
         instance_variable_get("@__#{day.to_s}")
       end
