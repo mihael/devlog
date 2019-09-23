@@ -1,3 +1,25 @@
+#23.09.2019 23:08:08 CodingSession::END
+
+some quick adjustments...
+
+wkhtmltopdf does not work very well yet. it produces a huge canvas for some reason, making the actual table look miniature until zoomed in.
+it's not a big issue, ii can open the generated html with safari and make an excellent pdf export.
+but, why does it do it like that...
+
+ahm, it seems to produce canvas sized as the current OS resolution, which then on this iMac becomes 5120x2880.
+
+solved to a degree with: wkhtmltopdf --dpi 400 --viewport-size 600x800 --orientation Portrait
+
+so now there's two more settings, a settings file might look like:
+
+	devlog_file: info/devlog.markdown
+	weekly_timesheet_template: info/weekly_timesheet.erb.html
+	convert_to_pdf_command: wkhtmltopdf --dpi 400 --viewport-size 600x800 --orientation Landscape
+
+and that's it. will publish this as 0.3.3 if it turns out to work well.
+
+#23.09.2019 19:39:39 CodingSession::BEGIN
+
 #23.09.2019 01:04:21 CodingSession::END
 
 took me some time to decide how to do this.
