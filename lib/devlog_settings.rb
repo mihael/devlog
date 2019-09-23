@@ -8,6 +8,10 @@ module Devlog
   # Allow settings.key besides settings[:key]
   # If the method name exists as a key within this Hash, fetch it.
   class Settings < Hash
+    def has?(m)
+      return key?(m) || key?(m.to_s)
+    end
+
     def method_missing(m, *args, &block)
       if key?(m)
         fetch m

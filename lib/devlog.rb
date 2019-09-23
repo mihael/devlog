@@ -294,14 +294,17 @@ module Devlog
     devlog_export_file
   end
 
-  def weekly_pdf(tajm, week = 0, devlog_file = 'devlog.markdown')
+  def weekly_pdf(tajm, weeks_from_now = 0, devlog_file = 'devlog.markdown')
     require 'erb'
     devlog_file = settings.devlog_file || devlog_file
-    template = settings.respond_to?(:weekly_timesheet_template) ? settings.weekly_timesheet_template : File.join(Devlog.path, 'templates', 'weekly_timesheet.erb.html')
+    template = settings.has?(:weekly_timesheet_template) ? settings.weekly_timesheet_template : File.join(Devlog.path, 'templates', 'weekly_timesheet.erb.html')
+    puts "Using weekly template: #{template} #{settings.has?(:weekly_timesheet_template)}".green
+
     now = DateTime.current.strftime('%Y-%m-%d')
     pdf = File.join(File.dirname(devlog_file), "sevendays-#{now.to_s}.pdf")
     html = File.join(File.dirname(devlog_file), "sevendays-#{now.to_s}.html")
-    zezzions = tajm.zezzions_for_week(week, DateTime.current)
+    zezzions = tajm.zezzions_for_week(weeks_from_now, DateTime.current)
+
     if zezzions.any?
       @sevendays = Sevendays.new(zezzions)
       renderer = ERB.new(File.read(template))
@@ -315,8 +318,14 @@ module Devlog
   end
 
   class Day
-    def initialize(zezzions)
+    # dayname: symbol of day, like :monday
+    def initialize(dayname, zezzions)
       @all = zezzions.sort # sorting by default by zzbegin
+      @dayname = Sevendays::DAYNAMES.include?(dayname) ? dayname : Sevendays::RANDOMDAYNAME
+    end
+
+    def any?
+      @all.any?
     end
 
     def total_hours
@@ -324,14 +333,18 @@ module Devlog
     end
 
     def begins_at
+      return '' unless any?
       @all.first.zzbegin.strftime('%H:%M')
     end
 
     def ends_at
+      return '' unless any?
       @all.last.zzend.strftime("%H:%M")
     end
 
     def breaks_at
+      return '' unless any?
+
       size = @all.size
 
       return "" if size < 2
@@ -355,6 +368,9 @@ module Devlog
   end
 
   class Sevendays
+    DAYNAMES = %i(monday tuesday wednesday thursday friday saturday sunday).freeze
+    RANDOMDAYNAME = 'Random'.freeze
+
     def initialize(zezzions)
       @all = zezzions.sort
     end
@@ -367,9 +383,13 @@ module Devlog
       DateTime.current.strftime("%Y/%m/%d")
     end
 
-    %i(monday tuesday wednesday thursday friday saturday sunday).each do |day|
+    DAYNAMES.each do |day|
+      attr_accessor day
+
       define_method(day) do
-        Day.new( @all.select { |zezzion| zezzion.zzbegin.send("#{day.to_s}?") } )
+        value = Day.new(day, @all.select { |zezzion| zezzion.zzbegin.send("#{day.to_s}?") } )
+        instance_variable_set("@__#{day.to_s}", value) unless instance_variable_get("@__#{day.to_s}")&.any?
+        instance_variable_get("@__#{day.to_s}")
       end
     end
   end
@@ -479,7 +499,7 @@ module Devlog
       begin_time = moment.beginning_of_week
       end_time = moment.end_of_week
 
-      puts("current_time: #{current_time} from_time: #{begin_time} to_time:#{end_time} moment: #{moment}")
+      #puts("current_time: #{current_time} from_time: #{begin_time} to_time:#{end_time} moment: #{moment}")
       selected_zezzions = select_zezzions(begin_time, end_time)
     end
 
