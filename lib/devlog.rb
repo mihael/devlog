@@ -298,6 +298,7 @@ module Devlog
     require 'erb'
     devlog_file = settings.devlog_file || devlog_file
     template = settings.has?(:weekly_timesheet_template) ? settings.weekly_timesheet_template : File.join(Devlog.path, 'templates', 'weekly_timesheet.erb.html')
+    convert_command = settings.has?(:convert_to_pdf_command) ? settings.convert_to_pdf_command : 'wkhtmltopdf'
     puts "Using weekly template: #{template} #{settings.has?(:weekly_timesheet_template)}".green
 
     zezzions = tajm.zezzions_for_week(weeks_from_now, DateTime.current)
@@ -312,7 +313,7 @@ module Devlog
 
       File.open(html,'w') {|f| f.write(renderer.result()) }
 
-      `wkhtmltopdf #{html} #{pdf}`
+      `#{convert_command} #{html} #{pdf}`
     else
       'No sessions to render.'.red
     end

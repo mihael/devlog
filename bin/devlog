@@ -31,11 +31,9 @@ exporting devlog into a book, which can be read top down, like normal books:
 
   #{'devlog'.green} x ~ exports into devlog.txt
 
-reporting devlog as a timesheet PDF:
+reporting devlog as a timesheet:
 
-  #{'devlog'.green} w ~ export a the current weekly timesheet into a PDF
-
-
+  #{'devlog'.green} w ~ export the current weekly timesheet into a html page and convert that into PDF
 EOF
 
 # arguments
