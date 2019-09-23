@@ -76,19 +76,33 @@ run in current folder and write out info.markdown, copy devlog to README.markdow
 
 `devlog saver`
 
+write out a weekly timesheet for the current week, using a ERB template producing html + PDF:
+
+`devlog w`
+
+writing out the week before the current one (and so on):
+
+`devlog w 1`
+
 settings
 ========
-
-currently only `devlog_file` can be configured. it represents the location of the devlog text file.
 
 the settings file is called `.devlog.yml`.
 
 it can be placed into a project folder from where one wants to be able to call `devlog`.
 
+this way you can keep your devlog.markdown anywhere on disk.
+
+`devlog_file` represents the location of the devlog text file.
+`weekly_timesheet_template` represents the location of the ERB weekly timesheet template, if you don't provide one, there's a default.
+`convert_to_pdf_command` represents the command used to convert the generated html into a signable PDF.
+
+file paths should be relative to `.devlog.yml`.
+
 example settings `.devlog.yml`:
 
 ```
 devlog_file: ../info/devlog.markdown
+weekly_timesheet_template: ../info/weekly_timesheet.erb.html
+convert_to_pdf_command: wkhtmltopdf --dpi 400  --viewport-size 600x800 --orientation Landscape
 ```
-
-the file path should be relative to `.devlog.yml`.
