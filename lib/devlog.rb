@@ -611,18 +611,22 @@ module Devlog
         s << ("Weekly Sessions\n")
         s << ("\n")
         sevendays = Sevendays.new(zezzions_for_week)
+        sevendays_total = 0
         Sevendays::DAYS.each do |day|
           current_day = sevendays.send(day.to_sym)
           dayname = day.upcase
           if current_day.any?
+            current_day_total_hours = current_day.total_hours
+            sevendays_total += current_day_total_hours
             s << ("#{dayname.upcase}\n")
             s << ("begins at: #{current_day.begins_at}\n")
             s << ("breaks: #{current_day.breaks_at}\n")
             s << ("end_at: #{current_day.ends_at}\n")
-            s << ("sum: #{current_day.total_hours}\n")
+            s << ("sum: #{current_day_total_hours}\n")
             s << ("\n")
           end
         end
+        s << ("Weekly sessions total: #{sevendays_total}\n")
       end
       s
     end
