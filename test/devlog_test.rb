@@ -189,7 +189,7 @@ class DevlogTest < Test::Unit::TestCase
 
   def test_devlog_export
     @exported_devlog = export_devlog_now(File.join(File.dirname(__FILE__), TEST_FILES_PATH, 'test_devlog_export.markdown'))
-    assert(File.exists?(@exported_devlog))
+    assert(File.exist?(@exported_devlog))
     assert(File.size(@exported_devlog)>0, "file should not be empty")
     File.open(@exported_devlog, "r") do |f|
       first = f.readline
@@ -250,6 +250,5 @@ class DevlogTest < Test::Unit::TestCase
     assert(@sevendays.friday.breaks_at == "12:00 -> 14:00", "one break on friday but is: #{@sevendays.friday.breaks_at}")
 
     assert(@sevendays.tuesday.breaks_at == "12:00 -> 13:00, 15:00 -> 20:00", "two breaks on tuesday but is: #{@sevendays.tuesday.breaks_at}")
-
   end
 end

@@ -226,7 +226,7 @@ module Devlog
   def save_info(devlog_file = 'devlog.markdown', info_file = 'info.markdown')
     info = parse_devlog_now(devlog_file)
     if info.has_info?
-      File.open(File.join(File.dirname(devlog_file), info_file), 'w') {|f| f.write(info.to_info_string(short=true)) }
+      File.open(File.join(File.dirname(devlog_file), info_file), 'w') {|f| f.write(info.to_info_string(true)) }
     else
       puts "No info present.".red
     end
@@ -321,7 +321,7 @@ module Devlog
 
   module SevendaysTotal
     def total_hours
-      total = all.inject(0) { |time, zezzion| time + zezzion.session_time }.round(2)
+      all.inject(0) { |time, zezzion| time + zezzion.session_time }.round(2)
     end
 
     def total_hours_string
@@ -340,6 +340,10 @@ module Devlog
     def initialize(day, zezzions)
       @all = zezzions.sort # sorting by default by zzbegin
       @day = Sevendays::DAYS.include?(day) ? day : Sevendays::RANDOMDAY
+    end
+
+    def name
+      @day
     end
 
     def any?
@@ -516,8 +520,15 @@ module Devlog
       begin_time = moment.beginning_of_week
       end_time = moment.end_of_week
 
-      #puts("current_time: #{current_time} from_time: #{begin_time} to_time:#{end_time} moment: #{moment}")
-      selected_zezzions = select_zezzions(begin_time, end_time)
+      select_zezzions(begin_time, end_time)
+    end
+
+    def zezzions_for_month(fromnow = 0, current_time = DateTime.current_time)
+      moment = current_time - (fromnow).months
+      begin_time = moment.beginning_of_month
+      end_time = moment.end_of_month
+
+      select_zezzions(begin_time, end_time)
     end
 
     def longest_session
@@ -596,6 +607,22 @@ module Devlog
         s << ("Longest Session     = #{self.longest_session.to_s}\n")
         s << ("Shortest Session    = #{self.shortest_session.to_s}\n")
         s << ("Last Session        = #{self.devlog_end.ago_in_words}, duration: #{self.last_session.session_time.round(3)} [h]")
+        s << ("\n")
+        s << ("Weekly Sessions\n")
+        s << ("\n")
+        sevendays = Sevendays.new(zezzions_for_week)
+        Sevendays::DAYS.each do |day|
+          current_day = sevendays.send(day.to_sym)
+          dayname = day.upcase
+          if current_day.any?
+            s << ("#{dayname.upcase}\n")
+            s << ("begins at: #{current_day.begins_at}\n")
+            s << ("breaks: #{current_day.breaks_at}\n")
+            s << ("end_at: #{current_day.ends_at}\n")
+            s << ("sum: #{current_day.total_hours}\n")
+            s << ("\n")
+          end
+        end
       end
       s
     end
@@ -655,6 +682,7 @@ module Devlog
       min = self.time / 60
       hours = min / 60
       days = hours / 24
+      days
     end
 
     # the whole coding session time
