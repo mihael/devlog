@@ -8,6 +8,10 @@ module Devlog
   # Allow settings.key besides settings[:key]
   # If the method name exists as a key within this Hash, fetch it.
   class Settings < Hash
+    def has?(m)
+      return key?(m) || key?(m.to_s)
+    end
+
     def method_missing(m, *args, &block)
       if key?(m)
         fetch m
@@ -29,7 +33,7 @@ module Devlog
   end
 
   def settings
-    @settings
+    @settings ||= Settings.new
   end
 
   # The default is the current folder with devlog.markdown in it.
@@ -37,9 +41,9 @@ module Devlog
 
   # Calculate a devlog_file path.
   def devlog_file_setting
-    return DEVLOG_FILE unless @settings
-    devlog_file_setting = @settings['devlog_file']
-    if devlog_file_setting && File.exists?(File.join(Dir.pwd, devlog_file_setting))
+    return DEVLOG_FILE unless settings
+    devlog_file_setting = settings['devlog_file']
+    if devlog_file_setting && File.exist?(File.join(Dir.pwd, devlog_file_setting))
       devlog_file_setting
     else
       DEVLOG_FILE

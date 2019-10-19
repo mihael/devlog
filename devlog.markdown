@@ -1,3 +1,50 @@
+#23.09.2019 23:08:08 CodingSession::END
+
+some quick adjustments...
+
+wkhtmltopdf does not work very well yet. it produces a huge canvas for some reason, making the actual table look miniature until zoomed in.
+it's not a big issue, ii can open the generated html with safari and make an excellent pdf export.
+but, why does it do it like that...
+
+ahm, it seems to produce canvas sized as the current OS resolution, which then on this iMac becomes 5120x2880.
+
+solved to a degree with: wkhtmltopdf --dpi 400 --viewport-size 600x800 --orientation Portrait
+
+so now there's two more settings, a settings file might look like:
+
+	devlog_file: info/devlog.markdown
+	weekly_timesheet_template: info/weekly_timesheet.erb.html
+	convert_to_pdf_command: wkhtmltopdf --dpi 400 --viewport-size 600x800 --orientation Landscape
+
+and that's it. will publish this as 0.3.3 if it turns out to work well.
+
+#23.09.2019 19:39:39 CodingSession::BEGIN
+
+#23.09.2019 01:04:21 CodingSession::END
+
+took me some time to decide how to do this.
+
+decided to generate a html from the pdf they gave.
+
+that was easy, but turned out as rubbish, so ii did it manually.
+
+then decided to populate that html with the data.
+
+and then decided to use wkhtmltopdf command line utility to convert the html back to pdf.
+
+have something, and it's configurable by devlogger. will need some more grind and polish.
+
+#22.09.2019 19:05:17 CodingSession::BEGIN
+
+#19.09.2019 23:34:08 CodingSession::END
+
+adding something ii need for a dayjob. at end of period employer wants a timesheet filled out.
+ii have no intent to do that manually ever again.
+
+weekly daily report, ...
+
+#19.09.2019 22:00:17 CodingSession::BEGIN
+
 #09.01.2018 23:38:01 CodingSession::END
 
 resolving a security issue reported by github. bumping nokogiri.

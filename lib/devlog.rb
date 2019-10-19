@@ -226,7 +226,7 @@ module Devlog
   def save_info(devlog_file = 'devlog.markdown', info_file = 'info.markdown')
     info = parse_devlog_now(devlog_file)
     if info.has_info?
-      File.open(File.join(File.dirname(devlog_file), info_file), 'w') {|f| f.write(info.to_info_string(short=true)) }
+      File.open(File.join(File.dirname(devlog_file), info_file), 'w') {|f| f.write(info.to_info_string(true)) }
     else
       puts "No info present.".red
     end
@@ -292,6 +292,127 @@ module Devlog
     end
 
     devlog_export_file
+  end
+
+  def weekly_pdf(tajm, weeks_from_now = 0, devlog_file = 'devlog.markdown')
+    require 'erb'
+    devlog_file = settings.devlog_file || devlog_file
+    template = settings.has?(:weekly_timesheet_template) ? settings.weekly_timesheet_template : File.join(Devlog.path, 'templates', 'weekly_timesheet.erb.html')
+    convert_command = settings.has?(:convert_to_pdf_command) ? settings.convert_to_pdf_command : 'wkhtmltopdf'
+    puts "Using weekly template: #{template} #{settings.has?(:weekly_timesheet_template)}".green
+
+    zezzions = tajm.zezzions_for_week(weeks_from_now, DateTime.current)
+
+    if zezzions.any?
+      file_id = zezzions.last.zzbegin.strftime("%Y-%m-%d")
+      pdf = File.join(File.dirname(devlog_file), "sevendays-#{file_id}.pdf")
+      html = File.join(File.dirname(devlog_file), "sevendays-#{file_id}.html")
+      @sevendays = Sevendays.new(zezzions)
+
+      renderer = ERB.new(File.read(template))
+
+      File.open(html,'w') {|f| f.write(renderer.result()) }
+
+      `#{convert_command} #{html} #{pdf}`
+    else
+      'No sessions to render.'.red
+    end
+  end
+
+  module SevendaysTotal
+    def total_hours
+      all.inject(0) { |time, zezzion| time + zezzion.session_time }.round(2)
+    end
+
+    def total_hours_string
+      total = total_hours
+
+      return "" if total <= 0
+
+      "#{total}h"
+    end
+  end
+
+  class Day
+    attr_accessor :all
+    include SevendaysTotal
+
+    def initialize(day, zezzions)
+      @all = zezzions.sort # sorting by default by zzbegin
+      @day = Sevendays::DAYS.include?(day) ? day : Sevendays::RANDOMDAY
+    end
+
+    def name
+      @day
+    end
+
+    def any?
+      all.any?
+    end
+
+    def begins_at
+      return '' unless any?
+      all.first.zzbegin.strftime('%H:%M')
+    end
+
+    def ends_at
+      return '' unless any?
+      all.last.zzend.strftime("%H:%M")
+    end
+
+    def breaks_at
+      return '' unless any?
+
+      size = all.size
+
+      return "" if size < 2
+
+      breaks = []
+      first = true
+      last = nil
+
+      all.each do |zezzion|
+        if first
+          last = zezzion
+          first = false
+        else
+          breaks << "#{last.zzend.strftime('%H:%M')} -> #{zezzion.zzbegin.strftime('%H:%M')}"
+          last = zezzion
+        end
+      end
+
+      breaks.join(', ')
+    end
+  end
+
+  class Sevendays
+    attr_accessor :all
+    include Devlog::SevendaysTotal
+
+    DAYS = %i(monday tuesday wednesday thursday friday saturday sunday).freeze
+    RANDOMDAY = 'Random'.freeze
+
+    def initialize(zezzions)
+      @all = zezzions.sort
+    end
+
+    def begins_at
+      all.first.zzbegin.strftime("%Y/%m/%d")
+    end
+
+    def date
+      DateTime.current.strftime("%Y/%m/%d")
+    end
+
+    DAYS.each do |day|
+      attr_accessor day
+
+      define_method(day) do
+        value = Day.new(day, all.select { |zezzion| zezzion.zzbegin.send("#{day.to_s}?") } )
+        instance_variable_set("@__#{day.to_s}", value) unless instance_variable_get("@__#{day.to_s}")&.any?
+        instance_variable_get("@__#{day.to_s}")
+      end
+    end
   end
 
   # The parsing object
@@ -379,12 +500,35 @@ module Devlog
       (coding_session_time + com_session_time + payed_time).round(2)
     end
 
-    # return hours worked for the last X days, from beginTime
-    def hours_for_last(days, beginTime = DateTime.now)
-      endTime = beginTime.to_time - days.days
-      selected_zezzions = @zezzions.select { |z| z.zzbegin.to_time < beginTime && z.zzend >= endTime }
-      # puts("Selected sessons from #{beginTime} to #{endTime}: #{selected_zezzions.size}")
+    # return hours worked for the last X days, from current_time
+    def hours_for_last(days, current_time = DateTime.now)
+      endTime = current_time.to_time - days.days
+      selected_zezzions = @zezzions.select { |z| z.zzbegin.to_time < current_time && z.zzend >= endTime }
+      #puts("Selected sessons from #{current_time} to #{endTime}: #{selected_zezzions.size}")
       selected_zezzions.inject(0) { |time, z| time + z.session_time }.round(2)
+    end
+
+    # from time to time select some zezzions
+    def select_zezzions(from_time, to_time)
+      @zezzions.select { |z| z.zzbegin.to_time > from_time && z.zzend.to_time <= to_time }
+    end
+
+    # returns zezzions recorded during beginning of week and end of week
+    # fromnow - how many weeks into the past
+    def zezzions_for_week(fromnow = 0, current_time = DateTime.current)
+      moment = current_time - (7 * fromnow).days
+      begin_time = moment.beginning_of_week
+      end_time = moment.end_of_week
+
+      select_zezzions(begin_time, end_time)
+    end
+
+    def zezzions_for_month(fromnow = 0, current_time = DateTime.current_time)
+      moment = current_time - (fromnow).months
+      begin_time = moment.beginning_of_month
+      end_time = moment.end_of_month
+
+      select_zezzions(begin_time, end_time)
     end
 
     def longest_session
@@ -463,6 +607,26 @@ module Devlog
         s << ("Longest Session     = #{self.longest_session.to_s}\n")
         s << ("Shortest Session    = #{self.shortest_session.to_s}\n")
         s << ("Last Session        = #{self.devlog_end.ago_in_words}, duration: #{self.last_session.session_time.round(3)} [h]")
+        s << ("\n")
+        s << ("Weekly Sessions\n")
+        s << ("\n")
+        sevendays = Sevendays.new(zezzions_for_week)
+        sevendays_total = 0
+        Sevendays::DAYS.each do |day|
+          current_day = sevendays.send(day.to_sym)
+          dayname = day.upcase
+          if current_day.any?
+            current_day_total_hours = current_day.total_hours
+            sevendays_total += current_day_total_hours
+            s << ("#{dayname.upcase}\n")
+            s << ("begins at: #{current_day.begins_at}\n")
+            s << ("breaks: #{current_day.breaks_at}\n")
+            s << ("end_at: #{current_day.ends_at}\n")
+            s << ("sum: #{current_day_total_hours}\n")
+            s << ("\n")
+          end
+        end
+        s << ("Weekly sessions total: #{sevendays_total}\n")
       end
       s
     end
@@ -486,6 +650,8 @@ module Devlog
   end
 
   class Zezzion
+    include Comparable
+
     COM = 1 # communication session
     COD = 0 # coding session
     attr_accessor :zzbegin, :zzend, :zzbegin_title, :zzend_title, :zztype
@@ -506,6 +672,10 @@ module Devlog
       @zzend_line_number = 0
     end
 
+    def <=>(other)
+      zzbegin <=> other.zzbegin
+    end
+
     # in seconds
     def time
       @zzend.to_time -  @zzbegin.to_time
@@ -516,6 +686,7 @@ module Devlog
       min = self.time / 60
       hours = min / 60
       days = hours / 24
+      days
     end
 
     # the whole coding session time
