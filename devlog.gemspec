@@ -11,7 +11,7 @@ Gem::Specification.new do |s|
   s.required_rubygems_version = Gem::Requirement.new(">= 0".freeze) if s.respond_to? :required_rubygems_version=
   s.require_paths = ["lib".freeze]
   s.authors = ["mihael".freeze]
-  s.date = "2019-09-23"
+  s.date = "2019-10-19"
   s.description = "devlog.markdown time&space extractor".freeze
   s.email = "kitschmaster@gmail.com".freeze
   s.executables = ["devlog".freeze]
