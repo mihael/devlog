@@ -34,8 +34,8 @@ devlog DSL
 
     #DD.MM.YYYY HH:MM:SS CodingSession::BEGIN
 
-using the devlog binary
-===================
+using the devlog CLI
+====================
 
 to parse a devlog file explicitly:
 
