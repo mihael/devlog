@@ -28,12 +28,11 @@ like a book, top down, but always start a new session on top of the file, so tha
 devlog DSL
 ==========
 
+    #DD.MM.YYYY HH:MM:SS CodingSession::END
 
-#DD.MM.YYYY HH:MM:SS CodingSession::END
+    devlog text...
 
-devlog text...
-
-#DD.MM.YYYY HH:MM:SS CodingSession::BEGIN
+    #DD.MM.YYYY HH:MM:SS CodingSession::BEGIN
 
 using the devlog binary
 ===================
