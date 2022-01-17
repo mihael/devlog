@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        ruby-version: [2.7.x, 2.6.x, 2.5.x]
+        ruby-version: [3.0.0, 2.7.3, 2.6.0, 2.5.0, 2.3.0]
         os: [ubuntu-latest, macOS-lates]
 
     steps:
