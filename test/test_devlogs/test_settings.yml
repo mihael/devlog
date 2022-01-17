@@ -1,5 +1,5 @@
 # Override the default location of the_project_folder_path/../info/devlog.markdown
 devlog_file: development_log.markdown
-
+timezone: Amsterdam
 nested:
   setting: xyz

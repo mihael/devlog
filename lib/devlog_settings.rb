@@ -49,4 +49,14 @@ module Devlog
       DEVLOG_FILE
     end
   end
+
+  def devlog_timezone
+    return 'Amsterdam' unless settings
+    devlog_timezone_setting = settings['timezone']
+    if devlog_timezone_setting.present?
+      devlog_timezone_setting
+    else
+      'Amsterdam'
+    end
+  end
 end
