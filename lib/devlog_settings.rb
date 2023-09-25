@@ -50,7 +50,7 @@ module Devlog
     end
   end
 
-  def devlog_timezone
+  def devlog_timezone_setting
     return 'Amsterdam' unless settings
     devlog_timezone_setting = settings['timezone']
     if devlog_timezone_setting.present?
