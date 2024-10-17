@@ -1,6 +1,12 @@
 require 'test_helper'
 
 class DevlogTest < Test::Unit::TestCase
+  test "VERSION" do
+    assert do
+      ::Devlog.const_defined?(:VERSION)
+    end
+  end
+
   def test_devlog_session_entry
     tajmstring = "\n##{Time.now.strftime(DATETIME_FORMAT)} CodingSession::BEGIN\n"
 

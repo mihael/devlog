@@ -2,7 +2,7 @@ require 'yaml'
 require 'ostruct'
 # require 'pry'
 
-#
+# Devlog settings
 module Devlog
   # Settings - keeping it simple.
   # Allow settings.key besides settings[:key]

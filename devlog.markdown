@@ -1,3 +1,9 @@
+#17.10.2024 09:10:08 CodingSession::END
+
+Fixing up for ruby 3. Ditching jeweler for bundler to package and release gem.
+
+#17.10.2024 05:20:32 CodingSession::BEGIN
+
 #23.09.2019 23:08:08 CodingSession::END
 
 some quick adjustments...

@@ -1,9 +1,7 @@
-require 'rubygems'
-require 'test/unit'
-
 $LOAD_PATH.unshift(File.dirname(__FILE__))
 $LOAD_PATH.unshift(File.join(File.dirname(__FILE__), '..', 'lib'))
 require 'devlog'
+require 'test/unit'
 
 TEST_FILES_PATH = 'test_devlogs'.freeze
 TEMP_PATH = '../tmp'.freeze

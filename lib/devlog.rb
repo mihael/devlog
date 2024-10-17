@@ -1,29 +1,16 @@
-#require "time"
-#require "date"
 require "active_support/all"
-require_relative "./devlog_settings"
+require_relative "devlog/version"
+require_relative "devlog/colors"
+require_relative "devlog/settings"
 
 # DEPRECATION WARNING: to_time will always preserve the timezone offset of the receiver in Rails 8.0. To opt in to the new behavior, set `ActiveSupport.to_time_preserves_timezone = true`
 ActiveSupport.to_time_preserves_timezone = true
-
-# Colors for devlog
-class String
-  def red; colorize(self, "\e[1m\e[31m"); end
-  def green; colorize(self, "\e[1m\e[32m"); end
-  def dark_green; colorize(self, "\e[32m"); end
-  def yellow; colorize(self, "\e[1m\e[33m"); end
-  def blue; colorize(self, "\e[1m\e[34m"); end
-  def dark_blue; colorize(self, "\e[34m"); end
-  def pur; colorize(self, "\e[1m\e[35m"); end
-  def colorize(text, color_code) "#{color_code}#{text}\e[0m" end
-end
 
 # The devlog module with all the mumbo
 module Devlog
   # :stopdoc:
   LIBPATH = ::File.expand_path(::File.dirname(__FILE__)) + ::File::SEPARATOR
   PATH = ::File.dirname(LIBPATH) + ::File::SEPARATOR
-  VERSION = File.open(File.join(File.dirname(__FILE__), %w[.. VERSION]), 'r').read
 
   # :startdoc:
   # Returns the version string for the library.
