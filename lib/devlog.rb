@@ -296,7 +296,7 @@ module Devlog
 
   def weekly_pdf(tajm, weeks_from_now = 0, devlog_file = 'devlog.markdown')
     require 'erb'
-    devlog_file = settings.devlog_file || devlog_file
+    devlog_file = settings.devlog_file_setting || devlog_file
     template = settings.has?(:weekly_timesheet_template) ? settings.weekly_timesheet_template : File.join(Devlog.path, 'templates', 'weekly_timesheet.erb.html')
     convert_command = settings.has?(:convert_to_pdf_command) ? settings.convert_to_pdf_command : 'wkhtmltopdf'
     puts "Using weekly template: #{template} #{settings.has?(:weekly_timesheet_template)}".green
@@ -398,6 +398,10 @@ module Devlog
 
     def begins_at
       all.first.zzbegin.strftime("%Y/%m/%d")
+    end
+
+    def ends_at
+      all.last.zzend.strftime("%Y/%m/%d")
     end
 
     def date
@@ -563,6 +567,10 @@ module Devlog
       @zezzions.last # devlog_end
     end
 
+    def last_payed_session
+      @zezzions.select{|zezzion| zezzion.payed_time<0}.first
+    end
+
     # return all sessions
     def devlog_sessions
       @zezzions
@@ -622,11 +630,21 @@ module Devlog
             s << ("begins at: #{current_day.begins_at}\n")
             s << ("breaks: #{current_day.breaks_at}\n")
             s << ("end_at: #{current_day.ends_at}\n")
-            s << ("sum: #{current_day_total_hours}\n")
+            s << ("sum: #{current_day_total_hours}h\n")
             s << ("\n")
           end
         end
-        s << ("Weekly sessions total: #{sevendays_total}\n")
+
+        0.upto(5) do |week|
+          weekly_zezzions = zezzions_for_week(week, DateTime.current)
+          if weekly_zezzions.any?
+            sevendays = Sevendays.new(weekly_zezzions)
+            s << ("#{sevendays.begins_at}->#{sevendays.ends_at}: #{sevendays.total_hours_string}\n")
+          else
+            s << "No weekly sessions for week #{week}.\n"
+          end
+        end
+        s << "Last payed: #{last_payed_session.zzend.to_s(:long)}" if last_payed_session
       end
       s
     end

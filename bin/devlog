@@ -68,6 +68,7 @@ include Devlog
 
 def dodo
   load_settings('.devlog.yml')
+  ENV['TZ'] = devlog_timezone_setting
   default_devlog_file = devlog_file_setting
   time = Benchmark.realtime do
     if @in_file_or_cmd =~ /.(markdown|md)$/ # devlog_file is passed directly via CLI

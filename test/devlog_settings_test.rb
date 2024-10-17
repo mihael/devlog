@@ -26,6 +26,8 @@ class DevlogSettingsTest < Test::Unit::TestCase
   def test_loading_from_yaml
     assert(settings.devlog_file == 'development_log.markdown',
            'example setting should be loaded')
+    assert(settings.timezone == 'Amsterdam',
+           'example setting should be loaded')
   end
 
   def test_devlog_file_setting_returns_default_when_overriden_devlog_file_does_not_exist
