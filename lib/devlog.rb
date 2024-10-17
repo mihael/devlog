@@ -1,7 +1,7 @@
 require "active_support/all"
 require_relative "devlog/date_time_ago_in_words"
 require_relative "devlog/version"
-require_relative "devlog/util"
+require_relative "devlog/utils"
 require_relative "devlog/settings"
 
 # DEPRECATION WARNING: to_time will always preserve the timezone offset of the receiver in Rails 8.0. To opt in to the new behavior, set `ActiveSupport.to_time_preserves_timezone = true`

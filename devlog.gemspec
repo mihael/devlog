@@ -44,7 +44,7 @@ Gem::Specification.new do |spec|
     "devlog.gemspec",
     "devlog.markdown",
     "lib/devlog.rb",
-    "lib/devlog/colors.rb",
+    "lib/devlog/utils.rb",
     "lib/devlog/settings.rb",
     "lib/devlog/version.rb",
     "sublime_text/devlog.tmbundle/Snippets/begin.tmSnippet",
