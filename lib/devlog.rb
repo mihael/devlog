@@ -326,7 +326,7 @@ module Devlog
 
   module SevendaysTotal
     def total_hours
-      all.inject(0) { |time, zezzion| time + zezzion.session_time }.round(2)
+      ((all.inject(0) { |time, zezzion| time + zezzion.session_time }) / 60 / 60).round(2)
     end
 
     def total_hours_string
@@ -334,7 +334,7 @@ module Devlog
 
       return "" if total <= 0
 
-      "#{total}h"
+      "#{total} [h]"
     end
   end
 
@@ -524,7 +524,6 @@ module Devlog
 
     # total charge time in hours, coding plus communication sessions - payed hours
     def unpayed_time
-      puts "unpayed_time: #{coding_session_time} #{com_session_time} #{payed_time}"
       (coding_session_time + com_session_time + payed_time).round(2)
     end
 
@@ -653,8 +652,8 @@ module Devlog
         end
         s << ("\n")
         s << ("Longest Session     = #{self.longest_session.to_s}\n")
-        s << ("Shortest Session    = #{self.shortest_session.to_s}\n")
-        s << ("Last Session        = #{self.devlog_end.ago_in_words}, duration: #{self.last_session.session_time.round(3)} [h]")
+        s << ("Shortest Session    = #{self.shortest_session.to_s_in_seconds}\n")
+        s << ("Last Session        = #{self.devlog_end.ago_in_words}, duration: #{self.last_session.in_hours} [h]")
         s << ("\n")
         s << ("Weekly Sessions\n")
         s << ("\n")
@@ -668,9 +667,9 @@ module Devlog
             sevendays_total += current_day_total_hours
             s << ("#{dayname.upcase}\n")
             s << ("begins at: #{current_day.begins_at}\n")
-            s << ("breaks: #{current_day.breaks_at}\n")
-            s << ("end_at: #{current_day.ends_at}\n")
-            s << ("sum: #{current_day_total_hours}h\n")
+            s << ("breaks at: #{current_day.breaks_at}\n")
+            s << ("ends at: #{current_day.ends_at}\n")
+            s << ("sum: #{current_day_total_hours} [h]\n")
             s << ("\n")
           end
         end
@@ -684,7 +683,7 @@ module Devlog
             s << "No weekly sessions for week #{week}.\n"
           end
         end
-        s << "Last payed: #{last_payed_session.zzend.to_s(:long)}" if last_payed_session
+        s << "Last payed: #{last_payed_session.zzend.to_s}" if last_payed_session
       end
       s
     end
@@ -769,7 +768,15 @@ module Devlog
     end
 
     def to_s
-      "#{session_time.round(3)} [h] #{type}, begin on line #{@zzbegin_line_number} at #{@zzbegin}, ends on line #{@zzend_line_number} at #{@zzend}"
+      "#{(session_time / 60 / 60).round(3)} [h] #{type}, begin on line #{@zzbegin_line_number} at #{@zzbegin}, ends on line #{@zzend_line_number} at #{@zzend}"
+    end
+
+    def to_s_in_seconds
+      "#{session_time.round(3)} [s] #{type}, begin on line #{@zzbegin_line_number} at #{@zzbegin}, ends on line #{@zzend_line_number} at #{@zzend}"
+    end
+
+    def in_hours
+      (session_time / 60 / 60).round(3)
     end
   end
 
@@ -813,6 +820,6 @@ module DateTimeAgoInWords
   end
 end
 
-class DateTime
+class ActiveSupport::TimeWithZone
   include DateTimeAgoInWords
 end
