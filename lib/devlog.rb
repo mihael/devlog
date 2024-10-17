@@ -3,6 +3,9 @@
 require "active_support/all"
 require_relative "./devlog_settings"
 
+# DEPRECATION WARNING: to_time will always preserve the timezone offset of the receiver in Rails 8.0. To opt in to the new behavior, set `ActiveSupport.to_time_preserves_timezone = true`
+ActiveSupport.to_time_preserves_timezone = true
+
 # Colors for devlog
 class String
   def red; colorize(self, "\e[1m\e[31m"); end

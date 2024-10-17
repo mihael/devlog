@@ -1,6 +1,12 @@
 require 'test_helper'
 
 class DevlogTest < Test::Unit::TestCase
+  def test_devlog_session_entry
+    tajmstring = "\n##{Time.now.strftime(DATETIME_FORMAT)} CodingSession::BEGIN\n"
+
+    assert_equal tajmstring, devlog_session_entry
+  end
+
   def test_empty_devlog
     @tajm = parse_devlog_now(File.join(File.dirname(__FILE__), TEST_FILES_PATH, 'empty_devlog.markdown'))
     puts "#{@tajm.coding_session_time} #{@tajm.com_session_time} #{@tajm.payed_time}"
