@@ -59,10 +59,21 @@ module Devlog
   end
 
   # Parsing datetime
+  def time_with_zone
+    if !Time.zone
+      tz = devlog_timezone_setting
+      puts "Setting timezone to: #{tz}"
+      Time.zone = tz
+    end
+    Time.zone
+  end
+
   DATETIME_FORMAT = '%d.%m.%Y %H:%M:%S'.freeze
   def parse_datetime(line)
     parts = line[1..-1].split
-    DateTime.strptime("#{parts[0]} #{parts[1]}", DATETIME_FORMAT)
+    result = time_with_zone.strptime("#{parts[0]} #{parts[1]}", DATETIME_FORMAT)
+    # puts "parse_datetime: #{line} => #{result}\n"
+    result
   rescue StandardError
     abort "\nError\nCan not parse line with invalid date:\n\n#{line}".to_s.blue
   end
@@ -104,8 +115,12 @@ module Devlog
           timeBegin_line_number = line_number
 
           # cs_time += (timeEnd - timeBegin).to_f * 24 #hours *60 #minutes *60 #seconds
-          delta = (timeEnd - timeBegin).to_f * 24 #hours *60 #minutes *60 #seconds
+          delta = (timeEnd - timeBegin) #.to_f * 24 #hours *60 #minutes *60 #seconds
           t.coding_session_time += delta
+
+          #puts "timeBegin: #{timeBegin.class} #{timeEnd.to_i - timeBegin.to_i}"
+          #puts "timeEnd: #{timeEnd}"
+          #puts "delta: #{delta}"
 
           # zezzion
           temp_zezzion.coding_session_time += delta
@@ -131,7 +146,7 @@ module Devlog
           timeBegin = parse_datetime(line)
           timeBegin_line_number = line_number
 
-          delta = (timeEnd - timeBegin).to_f * 24
+          delta = (timeEnd - timeBegin) #.to_f * 24
           t.com_session_time += delta
 
           # zezzion
@@ -153,7 +168,7 @@ module Devlog
           puts "error adding temp_zezzion com_session_time at line: #{line}"
         end
       elsif line =~ /\A\+[0-9]+[m]/
-        delta = (line.to_f / 60)
+        delta = (line.to_f * 60)
         t.com_session_time += delta
 
         # zezzion
@@ -163,7 +178,7 @@ module Devlog
           puts "error adding temp_zezzion com_session_time at line: #{line}"
         end
       elsif line =~ /\A\-[0-9]+[h]/
-        delta = (line.to_f)
+        delta = (line.to_f * 60 * 60)
         t.payed_time += delta
 
         # zezzion
@@ -182,7 +197,7 @@ module Devlog
 
   # Helper for the time entries
   def devlog_session_entry(session_type = 'Coding', begin_end = 'BEGIN')
-    "\n##{Time.now.strftime(DATETIME_FORMAT)} #{session_type}Session::#{begin_end}\n"
+    "\n##{time_with_zone.now.strftime(DATETIME_FORMAT)} #{session_type}Session::#{begin_end}\n"
   end
 
   # Prepend a string to a text file
@@ -454,6 +469,10 @@ module Devlog
       @zezzions.inject(0) { |time, zezzion| time + zezzion.session_time }.round(2)
     end
 
+    def session_time_h
+      (session_time / 60 / 60).round(2)
+    end
+
     # how many days devlog spans
     def devlog_days
       count_time( :days => 1)
@@ -474,12 +493,24 @@ module Devlog
       (self.session_time/self.devlog_days).round(2)
     end
 
+    def per_day_h
+      (per_day / 60 / 60).round(2)
+    end
+
     def per_week
       (self.session_time/self.devlog_weeks).round(2)
     end
 
+    def per_week_h
+      (per_week / 60 / 60).round(2)
+    end
+
     def per_month
       (self.session_time/self.devlog_months).round(2)
+    end
+
+    def per_month_h
+      (per_month / 60 / 60).round(2)
     end
 
     # total charge time in hours, coding plus communication sessions
@@ -487,9 +518,18 @@ module Devlog
       (coding_session_time + com_session_time).round(2)
     end
 
+    def charge_time_h
+      (charge_time / 60 / 60).round(2)
+    end
+
     # total charge time in hours, coding plus communication sessions - payed hours
     def unpayed_time
+      puts "unpayed_time: #{coding_session_time} #{com_session_time} #{payed_time}"
       (coding_session_time + com_session_time + payed_time).round(2)
+    end
+
+    def unpayed_time_h
+      (unpayed_time / 60 / 60).round(2)
     end
 
     # return hours worked for the last X days, from current_time
@@ -497,7 +537,7 @@ module Devlog
       endTime = current_time.to_time - days.days
       selected_zezzions = @zezzions.select { |z| z.zzbegin.to_time < current_time && z.zzend >= endTime }
       #puts("Selected sessons from #{current_time} to #{endTime}: #{selected_zezzions.size}")
-      selected_zezzions.inject(0) { |time, z| time + z.session_time }.round(2)
+      (selected_zezzions.inject(0) { |time, z| time + z.session_time }.round(2) / 60 / 60).round(2)
     end
 
     # from time to time select some zezzions
@@ -564,6 +604,18 @@ module Devlog
       @zezzions
     end
 
+    def coding_session_time_h
+      (coding_session_time / 60 / 60).round(2)
+    end
+
+    def com_session_time_h
+      (com_session_time / 60 / 60).round(2)
+    end
+
+    def payed_time_h
+      (payed_time / 60 / 60).round(2)
+    end
+
     def validation_string
       vs = ''
       vs << (@zezzions.any? ? '' : "No sessions recorded, add some first...\n".red)
@@ -572,11 +624,11 @@ module Devlog
 
     def to_info_string(short=false)
       s = ''
-      s <<  "\nSession::Time:      = #{self.session_time} [h]\n"
-      s << ("\nCodingSession::Time = %.1f [h]\n" % self.coding_session_time)
-      s << ("\nComSession::Time    = %.1f [h]\n" % self.com_session_time)
-      s << ("\nCharge::Time        = #{self.charge_time} [h]\n")
-      s << ("\nUnpayed::Time       = #{self.unpayed_time.to_s} [h]\n")
+      s <<  "\nSession::Time:      = #{session_time_h} [h]\n"
+      s << ("\nCodingSession::Time = %.1f [h]\n" % coding_session_time_h)
+      s << ("\nComSession::Time    = %.1f [h]\n" % com_session_time_h)
+      s << ("\nCharge::Time        = #{charge_time_h} [h]\n")
+      s << ("\nUnpayed::Time       = #{unpayed_time_h} [h]\n")
       s << ("\n")
       unless short
         s << ("Num of Sessions     = #{self.devlog_sessions.size}\n")

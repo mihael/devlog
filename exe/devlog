@@ -1,6 +1,8 @@
 #!/usr/bin/env ruby
 require 'benchmark'
 require File.expand_path(File.join(File.dirname(__FILE__), %w[.. lib devlog.rb]))
+require "active_support/configurable"
+
 USAGE = <<-EOF
 #{Devlog.display_version}
 This software is intended to parse and present information within devlog.markdown development logs. It also helps You to write the devlog.
@@ -68,7 +70,8 @@ include Devlog
 
 def dodo
   load_settings('.devlog.yml')
-  ENV['TZ'] = devlog_timezone_setting
+  tz = devlog_timezone_setting
+  puts "Timezone: {tz}"
   default_devlog_file = devlog_file_setting
   time = Benchmark.realtime do
     if @in_file_or_cmd =~ /.(markdown|md)$/ # devlog_file is passed directly via CLI
