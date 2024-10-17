@@ -6,9 +6,10 @@ class DevlogTest < Test::Unit::TestCase
   end
 
   def test_devlog_session_entry
+    dse = devlog_session_entry
     tajmstring = "\n##{Time.now.strftime(DATETIME_FORMAT)} CodingSession::BEGIN\n"
 
-    assert_equal tajmstring, devlog_session_entry
+    assert_equal tajmstring, dse
   end
 
   def test_empty_devlog
