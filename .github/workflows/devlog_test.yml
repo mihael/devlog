@@ -17,7 +17,7 @@ jobs:
         os: [ubuntu-latest, macOS-lates]
 
     steps:
-      - uses: actions/checkout@v2
+      - uses: actions/checkout@v4
       - name: Set up Ruby ${{ runner.os }}-§${{ matrix.ruby-version }}
         uses: ruby/setup-ruby@v1
         with:
