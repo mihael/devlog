@@ -171,7 +171,7 @@ class DevlogTest < Test::Unit::TestCase
     stop_coding_session(@empty_devlog)
     assert(File.readlines(@empty_devlog).grep(/CodingSession::END/).size>0, "should insert CodingSession::END at top of file")
     assert(is_session_open(@empty_devlog)==false, "should be false, session should be closed after stopping")
-    assert(File.exists?(@devlog_info)==true, "should exist")
+    assert(File.exist?(@devlog_info)==true, "should exist")
     hasinfo = parse_devlog_now(@empty_devlog).has_info?
     assert(hasinfo==true, 'should have info')
     assert(File.readlines(@devlog_info).grep(/Session::Time/).size>0, "should have info about Session::Time")
