@@ -16,7 +16,7 @@ jobs:
 
     strategy:
       matrix:
-        ruby-version: [3.3.3, 3.0.1, 2.3.0]
+        ruby-version: ['3.3.3', '3.0.1']
         os: [ubuntu-latest, macOS-latest]
 
     steps:
