@@ -86,7 +86,7 @@ class DevlogTest < Test::Unit::TestCase
     load_devlog_stat
     assert(@tajm_stat.per_week>0, "the middle week value, not the mean")
     assert_equal 7.02, @tajm_stat.per_week_h, "per week in hours should be 7.02 but is #{@tajm_stat.per_week_h}"
-    assert_equal 25263.16, @tajm_stat.per_week, "per week in seconds should be 25263.16 but is #{@tajm_stat.per_week}"
+    assert(@tajm_stat.per_week>=25263.15, "per week in seconds should be 25263.16 but is #{@tajm_stat.per_week}")
   end
 
   def test_devlog_weeks

@@ -1,6 +1,7 @@
 require "active_support/all"
+require_relative "devlog/date_time_ago_in_words"
 require_relative "devlog/version"
-require_relative "devlog/colors"
+require_relative "devlog/util"
 require_relative "devlog/settings"
 
 # DEPRECATION WARNING: to_time will always preserve the timezone offset of the receiver in Rails 8.0. To opt in to the new behavior, set `ActiveSupport.to_time_preserves_timezone = true`
@@ -459,18 +460,13 @@ module Devlog
       @zezzions.first.zzend
     end
 
-    # how much time between first session begin and last session end
-    # in seconds
-    # def devlog_time
-    #   (self.devlog_end.to_time - self.devlog_begin.to_time)/60.0/60.0
-    # end
-
+    # total session time
     def session_time
-      @zezzions.inject(0) { |time, zezzion| time + zezzion.session_time }.round(2)
+      @zezzions.inject(0) { |time, zezzion| time + zezzion.session_time }
     end
 
     def session_time_h
-      (session_time / 60 / 60).round(2)
+      session_time.rounded_hours
     end
 
     # how many days devlog spans
@@ -488,55 +484,55 @@ module Devlog
       count_time( :months => 1)
     end
 
-    # hours per day
+    # seconds per day
     def per_day
-      (self.session_time/self.devlog_days).round(2)
+      self.session_time/self.devlog_days
     end
 
     def per_day_h
-      (per_day / 60 / 60).round(2)
+      per_day.rounded_hours
     end
 
     def per_week
-      (self.session_time/self.devlog_weeks).round(2)
+      self.session_time/self.devlog_weeks
     end
 
     def per_week_h
-      (per_week / 60 / 60).round(2)
+      per_week.rounded_hours
     end
 
     def per_month
-      (self.session_time/self.devlog_months).round(2)
+      self.session_time/self.devlog_months
     end
 
     def per_month_h
-      (per_month / 60 / 60).round(2)
+      per_month.rounded_hours
     end
 
     # total charge time in hours, coding plus communication sessions
     def charge_time
-      (coding_session_time + com_session_time).round(2)
+      coding_session_time + com_session_time
     end
 
     def charge_time_h
-      (charge_time / 60 / 60).round(2)
+      charge_time.rounded_hours
     end
 
     # total charge time in hours, coding plus communication sessions - payed hours
     def unpayed_time
-      (coding_session_time + com_session_time + payed_time).round(2)
+      coding_session_time + com_session_time + payed_time
     end
 
     def unpayed_time_h
-      (unpayed_time / 60 / 60).round(2)
+      unpayed_time.rounded_hours
     end
 
     # return hours worked for the last X days, from current_time
     def hours_for_last(days, current_time = DateTime.now)
       endTime = current_time.to_time - days.days
       selected_zezzions = @zezzions.select { |z| z.zzbegin.to_time < current_time && z.zzend >= endTime }
-      #puts("Selected sessons from #{current_time} to #{endTime}: #{selected_zezzions.size}")
-      (selected_zezzions.inject(0) { |time, z| time + z.session_time }.round(2) / 60 / 60).round(2)
+
+      selected_zezzions.inject(0) { |time, z| time + z.session_time }.to_f.rounded_hours
     end
 
     # from time to time select some zezzions
@@ -604,15 +600,15 @@ module Devlog
     end
 
     def coding_session_time_h
-      (coding_session_time / 60 / 60).round(2)
+      coding_session_time.rounded_hours
     end
 
     def com_session_time_h
-      (com_session_time / 60 / 60).round(2)
+      com_session_time.rounded_hours
     end
 
     def payed_time_h
-      (payed_time / 60 / 60).round(2)
+      payed_time.rounded_hours
     end
 
     def validation_string
@@ -631,9 +627,9 @@ module Devlog
       s << ("\n")
       unless short
         s << ("Num of Sessions     = #{self.devlog_sessions.size}\n")
-        s << ("Hours per Day       = #{self.per_day} [h]\n")
-        s << ("Hours per Week      = #{self.per_week} [h]\n")
-        s << ("Hours per Month     = #{self.per_month} [h]\n")
+        s << ("Hours per Day       = #{self.per_day_h} [h]\n")
+        s << ("Hours per Week      = #{self.per_week_h} [h]\n")
+        s << ("Hours per Month     = #{self.per_month_h} [h]\n")
         s << ("Hours last 7 days   = #{self.hours_for_last(7)} [h]\n")
         s << ("Hours last 14 days  = #{self.hours_for_last(14)} [h]\n")
         s << ("Hours last 28 days  = #{self.hours_for_last(28)} [h]\n")
@@ -789,37 +785,4 @@ module Devlog
       @payed_time = 0.0
     end
   end
-end
-
-module DateTimeAgoInWords
-  def ago_in_words
-    return 'a very very long time ago' if self.year < 1800
-    secs = Time.now - self
-    return 'just over' if secs > -1 && secs < 1
-    return 'now' if secs <= -1
-    pair = ago_in_words_pair(secs)
-    ary = ago_in_words_singularize(pair)
-    ary.size == 0 ? '' : ary.join(' and ') << ' ago'
-  end
-  private
-  def ago_in_words_pair(secs)
-    [[60, :seconds], [60, :minutes], [24, :hours], [100_000, :days]].map{ |count, name|
-      if secs > 0
-        secs, n = secs.divmod(count)
-        "#{n.to_i} #{name}"
-      end
-    }.compact.reverse[0..1]
-  end
-  def ago_in_words_singularize(pair)
-    if pair.size == 1
-      pair.map! {|part| part[0, 2].to_i == 1 ? part.chomp('s') : part }
-    else
-      pair.map! {|part| part[0, 2].to_i == 1 ? part.chomp('s') : part[0, 2].to_i == 0 ? nil : part }
-    end
-    pair.compact
-  end
-end
-
-class ActiveSupport::TimeWithZone
-  include DateTimeAgoInWords
 end
