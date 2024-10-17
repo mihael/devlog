@@ -1,3 +1,19 @@
+#17.10.2024 09:10:08 CodingSession::END
+
+Fixing up for ruby 3 and doing some minor cleanup.
+
+Ditching jeweler for bundler to package and release gem.
+
+The tasks to work with the gem are now:
+
+		rake build
+		rake install
+		rake release
+
+More here: https://bundler.io/guides/creating_gem.html
+
+#17.10.2024 05:20:32 CodingSession::BEGIN
+
 #23.09.2019 23:08:08 CodingSession::END
 
 some quick adjustments...
@@ -129,7 +145,6 @@ just 10 errors, not failures, but what is the difference between the two, 0 is n
 aha... no comment haha...
 
 #09.02.2015 15:41:09 CodingSession::BEGIN
-
 
 #02.02.2015 17:53:20 CodingSession::END
 

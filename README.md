@@ -105,3 +105,19 @@ devlog_file: ../info/devlog.markdown
 weekly_timesheet_template: ../info/weekly_timesheet.erb.html
 convert_to_pdf_command: wkhtmltopdf --dpi 400  --viewport-size 600x800 --orientation Landscape
 ```
+
+development
+===========
+
+Run test suite:
+
+```
+rake test
+```
+
+Build and install gem locally:
+
+```
+rake build
+rake install
+```
