@@ -8,7 +8,6 @@ require 'devlog'
 TEST_FILES_PATH = 'test_devlogs'.freeze
 TEMP_PATH = '../tmp'.freeze
 
-
 class Test::Unit::TestCase
   include Devlog
 
