@@ -409,8 +409,6 @@ module Devlog
     end
 
     DAYS.each do |day|
-      attr_accessor day
-
       define_method(day) do
         value = Day.new(day, all.select { |zezzion| zezzion.zzbegin.send("#{day.to_s}?") } )
         instance_variable_set("@__#{day.to_s}", value) unless instance_variable_get("@__#{day.to_s}")&.any?
