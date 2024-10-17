@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.email = ["kitschmaster@gmail.com"]
 
   spec.summary = "Write a development log while also easily track time spent in coding sessions using just a markdown text file and a few CLI commands."
-  spec.description = "devlog.markdown time&space extractor ~ Track the time spent in coding sessions while also writing a development log. Export a timesheet for your bills."
+  spec.description = "devlog.markdown time&space extractor ~ Track the time spent in coding sessions and money payed to you, while also writing a development log. Export a timesheet for your bills."
   spec.homepage = "https://manitu.si/devlog"
   spec.license = "MIT"
   spec.required_ruby_version = ">= 3.0.0"
