@@ -45,6 +45,7 @@ Gem::Specification.new do |spec|
     "devlog.markdown",
     "lib/devlog.rb",
     "lib/devlog/utils.rb",
+    "lib/devlog/date_time_ago_in_words.rb",
     "lib/devlog/settings.rb",
     "lib/devlog/version.rb",
     "sublime_text/devlog.tmbundle/Snippets/begin.tmSnippet",
